@@ -6,535 +6,128 @@
 <title>即時投票結果</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --bg: #03050d;
-    --gold: #f5c842;
-    --c1: #6c63ff;
-    --c2: #ff6584;
-    --c3: #43e97b;
-    --surface: rgba(255,255,255,0.03);
-    --border: rgba(255,255,255,0.08);
-  }
-
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: white;
-    min-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Bg effects */
-  .bg-layer {
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,99,255,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 10% 90%, rgba(67,233,123,0.06) 0%, transparent 50%),
-      radial-gradient(ellipse 40% 40% at 90% 90%, rgba(255,101,132,0.06) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Scan line effect */
-  .scanline {
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 3px,
-      rgba(0,0,0,0.08) 3px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
-  }
-
-  /* Corner brackets */
-  .corner {
-    position: fixed;
-    width: 50px; height: 50px;
-    border-color: rgba(108,99,255,0.4);
-    border-style: solid;
-    z-index: 2;
-  }
-  .corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
-  .corner-tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
-  .corner-bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
-  .corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
-
-  /* Header */
-  .header {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 28px 48px 0;
-  }
-
-  .header-left {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-  }
-
-  .title-main {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 42px;
-    letter-spacing: 0.08em;
-    color: white;
-    line-height: 1;
-  }
-
-  .title-sub {
-    font-size: 13px;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 0.15em;
-    font-weight: 300;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-  }
-
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,68,68,0.1);
-    border: 1px solid rgba(255,68,68,0.3);
-    border-radius: 100px;
-    padding: 8px 18px;
-  }
-
-  .live-dot {
-    width: 8px; height: 8px;
-    background: #ff4444;
-    border-radius: 50%;
-    box-shadow: 0 0 8px rgba(255,68,68,0.8);
-    animation: liveblink 1s ease-in-out infinite;
-  }
-
-  @keyframes liveblink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .live-text {
-    font-size: 12px;
-    letter-spacing: 0.2em;
-    color: #ff6666;
-    font-weight: 700;
-  }
-
-  .stat-pill {
-    text-align: center;
-  }
-
-  .stat-pill-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 0.05em;
-    color: var(--gold);
-    line-height: 1;
-    transition: all 0.4s;
-  }
-
-  .stat-pill-label {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.3);
-    margin-top: 2px;
-  }
-
-  .clock {
-    font-family: 'Space Mono', monospace;
-    font-size: 20px;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 0.1em;
-  }
-
-  /* Divider */
-  .header-divider {
-    position: relative;
-    z-index: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(108,99,255,0.4), rgba(255,255,255,0.1), rgba(108,99,255,0.4), transparent);
-    margin: 20px 48px 0;
-  }
-
-  /* Main candidates area */
-  .candidates-wrapper {
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    display: flex;
-    align-items: stretch;
-    padding: 32px 48px 28px;
-    gap: 24px;
-  }
-
-  .candidate-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 28px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.5s;
-  }
-
-  .candidate-panel.leading {
-    border-color: rgba(245,200,66,0.4);
-    box-shadow: 0 0 40px rgba(245,200,66,0.08), inset 0 0 40px rgba(245,200,66,0.03);
-  }
-
-  /* Color accents per candidate */
-  .candidate-panel:nth-child(1) { --c: var(--c1); }
-  .candidate-panel:nth-child(2) { --c: var(--c2); }
-  .candidate-panel:nth-child(3) { --c: var(--c3); }
-
-  .candidate-panel::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--c);
-    border-radius: 20px 20px 0 0;
-    opacity: 0.6;
-    transition: opacity 0.5s;
-  }
-
-  .candidate-panel.leading::before { opacity: 1; }
-
-  /* Leading crown */
-  .crown {
-    position: absolute;
-    top: 16px; right: 20px;
-    font-size: 24px;
-    opacity: 0;
-    transition: opacity 0.5s;
-    animation: crownBob 2s ease-in-out infinite;
-  }
-
-  @keyframes crownBob {
-    0%, 100% { transform: translateY(0) rotate(-5deg); }
-    50% { transform: translateY(-4px) rotate(5deg); }
-  }
-
-  .candidate-panel.leading .crown { opacity: 1; }
-
-  .candidate-no {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: var(--c);
-    opacity: 0.6;
-    margin-bottom: 12px;
-  }
-
-  .candidate-emoji-big {
-    font-size: 64px;
-    margin-bottom: 16px;
-    display: block;
-    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.4));
-  }
-
-  .candidate-name-big {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 40px;
-    letter-spacing: 0.08em;
-    color: white;
-    margin-bottom: 6px;
-    line-height: 1;
-  }
-
-  .candidate-desc-big {
-    font-size: 13px;
-    color: rgba(255,255,255,0.35);
-    line-height: 1.6;
-    margin-bottom: 28px;
-    flex: 1;
-  }
-
-  /* Vote display */
-  .vote-display {
-    margin-top: auto;
-  }
-
-  .vote-num-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  .vote-big-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 80px;
-    line-height: 1;
-    color: var(--c);
-    letter-spacing: 0.02em;
-    text-shadow: 0 0 30px color-mix(in srgb, var(--c) 40%, transparent);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .vote-unit { font-size: 16px; color: rgba(255,255,255,0.3); }
-
-  .vote-pct {
-    font-family: 'Space Mono', monospace;
-    font-size: 28px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.05em;
-    transition: all 0.4s;
-  }
-
-  /* Progress bar */
-  .progress-track {
-    height: 8px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 100px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--c);
-    border-radius: 100px;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-  }
-
-  .progress-fill::after {
-    content: '';
-    position: absolute;
-    right: 0; top: 0; bottom: 0;
-    width: 20px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.4));
-    animation: shimmer 2s linear infinite;
-  }
-
-  @keyframes shimmer {
-    from { opacity: 0; }
-    50% { opacity: 1; }
-    to { opacity: 0; }
-  }
-
-  /* Rank label */
-  .rank-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    color: rgba(255,255,255,0.25);
-    transition: all 0.5s;
-  }
-
-  .candidate-panel.leading .rank-label {
-    color: var(--gold);
-  }
-
-  /* Footer bar */
-  .footer-bar {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 48px 24px;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    color: rgba(255,255,255,0.15);
-  }
-
-  /* Particle burst on vote */
-  @keyframes voteFlash {
-    0% { box-shadow: 0 0 0 0 rgba(245,200,66,0.4); }
-    50% { box-shadow: 0 0 0 20px rgba(245,200,66,0); }
-    100% { box-shadow: 0 0 0 0 rgba(245,200,66,0); }
-  }
-
-  .vote-flash {
-    animation: voteFlash 0.6s ease-out;
-  }
-
-  /* Number count-up animation */
-  @keyframes numPop {
-    0% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-  }
-  .num-pop { animation: numPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#03050d;--c1:#6c63ff;--c2:#ff6584;--c3:#43e97b;--surface:rgba(255,255,255,.03);--border:rgba(255,255,255,.08)}
+  body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:white;min-height:100vh;overflow:hidden;display:flex;flex-direction:column}
+  .bg-layer{position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(108,99,255,.12) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 10% 90%,rgba(67,233,123,.06) 0%,transparent 50%),radial-gradient(ellipse 40% 40% at 90% 90%,rgba(255,101,132,.06) 0%,transparent 50%);pointer-events:none;z-index:0}
+  .corner{position:fixed;width:50px;height:50px;border-color:rgba(108,99,255,.4);border-style:solid;z-index:2}
+  .corner-tl{top:20px;left:20px;border-width:2px 0 0 2px}.corner-tr{top:20px;right:20px;border-width:2px 2px 0 0}
+  .corner-bl{bottom:20px;left:20px;border-width:0 0 2px 2px}.corner-br{bottom:20px;right:20px;border-width:0 2px 2px 0}
+  .header{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:28px 48px 0;flex-wrap:wrap;gap:12px}
+  .title-main{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.08em;color:white;line-height:1}
+  .title-sub{font-size:13px;color:rgba(255,255,255,.3);letter-spacing:.15em;font-weight:300}
+  .header-right{display:flex;align-items:center;gap:32px}
+  .live-badge{display:flex;align-items:center;gap:8px;background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);border-radius:100px;padding:8px 18px}
+  .live-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;box-shadow:0 0 8px rgba(255,68,68,.8);animation:liveblink 1s ease-in-out infinite}
+  @keyframes liveblink{0%,100%{opacity:1}50%{opacity:.4}}
+  .live-text{font-size:12px;letter-spacing:.2em;color:#ff6666;font-weight:700}
+  .stat-pill-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.05em;color:#f5c842;line-height:1;transition:all .4s}
+  .stat-pill-label{font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.3);margin-top:2px}
+  .clock{font-family:'Space Mono',monospace;font-size:20px;color:rgba(255,255,255,.4);letter-spacing:.1em}
+  .header-divider{position:relative;z-index:1;height:1px;background:linear-gradient(to right,transparent,rgba(108,99,255,.4),rgba(255,255,255,.1),rgba(108,99,255,.4),transparent);margin:20px 48px 0}
+  .candidates-wrapper{position:relative;z-index:1;flex:1;display:flex;align-items:stretch;padding:32px 48px 28px;gap:24px}
+  .candidate-panel{flex:1;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;position:relative;overflow:hidden;transition:border-color .5s}
+  .candidate-panel.leading{border-color:rgba(245,200,66,.4);box-shadow:0 0 40px rgba(245,200,66,.08),inset 0 0 40px rgba(245,200,66,.03)}
+  .candidate-panel:nth-child(1){--c:var(--c1)}.candidate-panel:nth-child(2){--c:var(--c2)}.candidate-panel:nth-child(3){--c:var(--c3)}
+  .candidate-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--c);border-radius:20px 20px 0 0;opacity:.6;transition:opacity .5s}
+  .candidate-panel.leading::before{opacity:1}
+  .crown{position:absolute;top:16px;right:20px;font-size:24px;opacity:0;transition:opacity .5s;animation:crownBob 2s ease-in-out infinite}
+  @keyframes crownBob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-4px) rotate(5deg)}}
+  .candidate-panel.leading .crown{opacity:1}
+  .candidate-no{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--c);opacity:.6;margin-bottom:12px}
+  .candidate-emoji-big{font-size:64px;margin-bottom:16px;display:block}
+  .candidate-name-big{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:.08em;color:white;margin-bottom:6px;line-height:1}
+  .candidate-desc-big{font-size:13px;color:rgba(255,255,255,.35);line-height:1.6;margin-bottom:28px;flex:1}
+  .vote-display{margin-top:auto}
+  .vote-num-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .vote-big-num{font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:1;color:var(--c);letter-spacing:.02em;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+  .vote-unit{font-size:16px;color:rgba(255,255,255,.3)}
+  .vote-pct{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:rgba(255,255,255,.5);transition:all .4s}
+  .progress-track{height:8px;background:rgba(255,255,255,.06);border-radius:100px;overflow:hidden;margin-bottom:10px}
+  .progress-fill{height:100%;background:var(--c);border-radius:100px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+  .rank-label{font-size:11px;letter-spacing:.15em;color:rgba(255,255,255,.25);transition:all .5s}
+  .candidate-panel.leading .rank-label{color:#f5c842}
+  .footer-bar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:0 48px 24px;font-size:11px;letter-spacing:.15em;color:rgba(255,255,255,.15)}
+  @keyframes numPop{0%{transform:scale(1.3)}100%{transform:scale(1)}}
+  .num-pop{animation:numPop .4s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes voteFlash{0%{box-shadow:0 0 0 0 rgba(245,200,66,.4)}50%{box-shadow:0 0 0 20px rgba(245,200,66,0)}100%{box-shadow:0 0 0 0 rgba(245,200,66,0)}}
+  .vote-flash{animation:voteFlash .6s ease-out}
 </style>
 </head>
 <body>
-
 <div class="bg-layer"></div>
-<div class="scanline"></div>
-
-<div class="corner corner-tl"></div>
-<div class="corner corner-tr"></div>
-<div class="corner corner-bl"></div>
-<div class="corner corner-br"></div>
-
-<!-- Header -->
+<div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div><div class="corner corner-br"></div>
 <div class="header">
-  <div class="header-left">
-    <div class="title-main">即時投票結果</div>
-    <div class="title-sub">匿名 · 公開 · 即時更新</div>
-  </div>
+  <div><div class="title-main">即時投票結果</div><div class="title-sub">匿名 · 公開 · 即時更新</div></div>
   <div class="header-right">
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      <div class="live-text">LIVE</div>
-    </div>
-    <div class="stat-pill">
-      <div class="stat-pill-val" id="total-display">0</div>
-      <div class="stat-pill-label">總票數</div>
-    </div>
+    <div class="live-badge"><div class="live-dot"></div><div class="live-text">LIVE</div></div>
+    <div><div class="stat-pill-val" id="total-display">0</div><div class="stat-pill-label">總票數</div></div>
     <div class="clock" id="clock">00:00:00</div>
   </div>
 </div>
-
 <div class="header-divider"></div>
-
-<!-- Candidates -->
-<div class="candidates-wrapper" id="candidates-wrapper">
-  <!-- Rendered by JS -->
-</div>
-
-<!-- Footer -->
+<div class="candidates-wrapper" id="candidates-wrapper"></div>
 <div class="footer-bar">
   <span>每位評審限投一票 · 資料匿名處理</span>
-  <span id="last-sync">等待資料中...</span>
+  <span id="last-sync">連線中...</span>
   <span>ANONYMOUS LIVE VOTING SYSTEM</span>
 </div>
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-const CANDIDATES = [
-  { id: 'A', emoji: '🦁', name: '張志明', desc: '主張創新科技導向，提升工作效率' },
-  { id: 'B', emoji: '🦊', name: '李美玲', desc: '著重團隊文化建設與員工福利' },
-  { id: 'C', emoji: '🐬', name: '王大偉', desc: '強調永續發展與社會責任' },
-];
-
-let prevVotes = { A: 0, B: 0, C: 0 };
-
-function getVotes() {
-  try {
-    const data = JSON.parse(localStorage.getItem('voteSync') || '{"votes":{}}');
-    return data.votes || { A: 0, B: 0, C: 0 };
-  } catch(e) { return { A: 0, B: 0, C: 0 }; }
-}
-
-function render() {
-  const votes = getVotes();
-  const total = Object.values(votes).reduce((a,b) => a+b, 0);
-
-  // Find leader
-  let maxVotes = -1, leaderId = null;
-  CANDIDATES.forEach(c => { if ((votes[c.id]||0) > maxVotes) { maxVotes = votes[c.id]||0; leaderId = c.id; } });
-
-  document.getElementById('total-display').textContent = total;
-
-  const wrapper = document.getElementById('candidates-wrapper');
-  if (!wrapper.children.length) {
-    // Initial render
-    wrapper.innerHTML = CANDIDATES.map((c, i) => `
-      <div class="candidate-panel ${c.id === leaderId && total > 0 ? 'leading' : ''}" id="panel-${c.id}">
-        <div class="crown">👑</div>
-        <div class="candidate-no">NO. ${c.id}</div>
-        <span class="candidate-emoji-big">${c.emoji}</span>
-        <div class="candidate-name-big">${c.name}</div>
-        <div class="candidate-desc-big">${c.desc}</div>
-        <div class="vote-display">
-          <div class="vote-num-row">
-            <div>
-              <span class="vote-big-num" id="num-${c.id}">${votes[c.id]||0}</span>
-              <span class="vote-unit"> 票</span>
-            </div>
-            <div class="vote-pct" id="pct-${c.id}">${total > 0 ? Math.round((votes[c.id]||0)/total*100) : 0}%</div>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="bar-${c.id}" style="width:${total > 0 ? (votes[c.id]||0)/total*100 : 0}%"></div>
-          </div>
-          <div class="rank-label" id="rank-${c.id}">
-            ${c.id === leaderId && total > 0 ? '▲ 目前領先' : '—'}
-          </div>
-        </div>
-      </div>
-    `).join('');
-  } else {
-    // Update existing
-    CANDIDATES.forEach(c => {
-      const count = votes[c.id] || 0;
-      const pct = total > 0 ? Math.round(count / total * 100) : 0;
-
-      const numEl = document.getElementById(`num-${c.id}`);
-      const pctEl = document.getElementById(`pct-${c.id}`);
-      const barEl = document.getElementById(`bar-${c.id}`);
-      const rankEl = document.getElementById(`rank-${c.id}`);
-      const panelEl = document.getElementById(`panel-${c.id}`);
-
-      if (count !== prevVotes[c.id]) {
-        numEl.classList.remove('num-pop');
-        void numEl.offsetWidth;
-        numEl.classList.add('num-pop');
-        panelEl.classList.add('vote-flash');
-        setTimeout(() => panelEl.classList.remove('vote-flash'), 700);
-      }
-
-      numEl.textContent = count;
-      pctEl.textContent = pct + '%';
-      barEl.style.width = pct + '%';
-
-      const isLeading = c.id === leaderId && total > 0;
-      panelEl.classList.toggle('leading', isLeading);
-      rankEl.textContent = isLeading ? '▲ 目前領先' : '—';
-    });
-  }
-
-  prevVotes = { ...votes };
-
-  const now = new Date();
-  document.getElementById('last-sync').textContent =
-    `最後同步：${now.toLocaleTimeString('zh-TW')}`;
-}
-
-// Clock
-function updateClock() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-}
-
-setInterval(updateClock, 1000);
-updateClock();
-
-// Poll for updates
-render();
-setInterval(render, 800);
-
-// Listen for storage events (cross-tab)
-window.addEventListener('storage', (e) => {
-  if (e.key === 'voteSync') render();
+firebase.initializeApp({
+  apiKey:"AIzaSyA2ZpeIZDLEpysnECE0WMvYoUkbrZ-SnK8",
+  authDomain:"voting-system-6629b.firebaseapp.com",
+  databaseURL:"https://voting-system-6629b-default-rtdb.firebaseio.com",
+  projectId:"voting-system-6629b",
+  storageBucket:"voting-system-6629b.firebasestorage.app",
+  messagingSenderId:"769201801560",
+  appId:"1:769201801560:web:f4144db3ad9310855cbd2d"
 });
+const db=firebase.database();
+const CANDIDATES=[{id:'A',emoji:'🦁',name:'張志明',desc:'主張創新科技導向，提升工作效率'},{id:'B',emoji:'🦊',name:'李美玲',desc:'著重團隊文化建設與員工福利'},{id:'C',emoji:'🐬',name:'王大偉',desc:'強調永續發展與社會責任'}];
+let prevVotes={A:0,B:0,C:0},votes={A:0,B:0,C:0},initialized=false;
+db.ref('votes').on('value',snap=>{
+  const v=snap.val()||{};votes={A:v.A||0,B:v.B||0,C:v.C||0};
+  const total=Object.values(votes).reduce((a,b)=>a+b,0);
+  document.getElementById('total-display').textContent=total;
+  document.getElementById('last-sync').textContent='最後同步：'+new Date().toLocaleTimeString('zh-TW');
+  if(!initialized){buildPanels();initialized=true;}else{updatePanels();}
+  prevVotes={...votes};
+});
+function getLeader(){let m=-1,id=null;CANDIDATES.forEach(c=>{if((votes[c.id]||0)>m){m=votes[c.id]||0;id=c.id;}});return id;}
+function buildPanels(){
+  const total=Object.values(votes).reduce((a,b)=>a+b,0),leaderId=getLeader();
+  document.getElementById('candidates-wrapper').innerHTML=CANDIDATES.map(c=>{
+    const count=votes[c.id]||0,pct=total>0?Math.round(count/total*100):0,isLeading=c.id===leaderId&&total>0;
+    return `<div class="candidate-panel ${isLeading?'leading':''}" id="panel-${c.id}">
+      <div class="crown">👑</div><div class="candidate-no">NO. ${c.id}</div>
+      <span class="candidate-emoji-big">${c.emoji}</span>
+      <div class="candidate-name-big">${c.name}</div>
+      <div class="candidate-desc-big">${c.desc}</div>
+      <div class="vote-display">
+        <div class="vote-num-row"><div><span class="vote-big-num" id="num-${c.id}">${count}</span><span class="vote-unit"> 票</span></div><div class="vote-pct" id="pct-${c.id}">${pct}%</div></div>
+        <div class="progress-track"><div class="progress-fill" id="bar-${c.id}" style="width:${pct}%"></div></div>
+        <div class="rank-label" id="rank-${c.id}">${isLeading?'▲ 目前領先':'—'}</div>
+      </div></div>`;
+  }).join('');
+}
+function updatePanels(){
+  const total=Object.values(votes).reduce((a,b)=>a+b,0),leaderId=getLeader();
+  CANDIDATES.forEach(c=>{
+    const count=votes[c.id]||0,pct=total>0?Math.round(count/total*100):0;
+    const numEl=document.getElementById('num-'+c.id),panelEl=document.getElementById('panel-'+c.id);
+    if(numEl&&count!==prevVotes[c.id]){numEl.classList.remove('num-pop');void numEl.offsetWidth;numEl.classList.add('num-pop');panelEl.classList.add('vote-flash');setTimeout(()=>panelEl.classList.remove('vote-flash'),700);}
+    if(numEl)numEl.textContent=count;
+    const pctEl=document.getElementById('pct-'+c.id);if(pctEl)pctEl.textContent=pct+'%';
+    const barEl=document.getElementById('bar-'+c.id);if(barEl)barEl.style.width=pct+'%';
+    const isLeading=c.id===leaderId&&total>0;
+    if(panelEl)panelEl.classList.toggle('leading',isLeading);
+    const rankEl=document.getElementById('rank-'+c.id);if(rankEl)rankEl.textContent=isLeading?'▲ 目前領先':'—';
+  });
+}
+setInterval(()=>{const n=new Date();document.getElementById('clock').textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');},1000);
 </script>
 </body>
 </html>

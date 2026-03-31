@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掃描投票 QR Code</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&family=Bebas+Neue&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #f5c842;
+    --gold2: #e8a820;
+    --bg: #050810;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(245,200,66,0.2);
+  }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Animated star field */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--dur) ease-in-out infinite var(--delay);
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.8; }
+  }
+
+  /* Radial glow */
+  .glow-bg {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 50%, rgba(245,200,66,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 50% 100%, rgba(245,200,66,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Corner decorations */
+  .corner {
+    position: fixed;
+    width: 80px; height: 80px;
+    border-color: rgba(245,200,66,0.3);
+    border-style: solid;
+    z-index: 1;
+  }
+  .corner-tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
+
+  /* Main layout */
+  .main {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 60px;
+    align-items: center;
+    padding: 40px;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  /* Left: title block */
+  .title-block {
+    text-align: right;
+  }
+
+  .event-label {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 16px;
+    font-weight: 300;
+  }
+
+  .main-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 7vw, 90px);
+    letter-spacing: 0.05em;
+    line-height: 0.95;
+    color: white;
+    margin-bottom: 20px;
+  }
+
+  .main-title span {
+    display: block;
+    color: var(--gold);
+    -webkit-text-stroke: 0px;
+    text-shadow: 0 0 40px rgba(245,200,66,0.5);
+  }
+
+  .desc {
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .step-num {
+    width: 26px; height: 26px;
+    border: 1px solid rgba(245,200,66,0.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--gold);
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+
+  /* Center: QR */
+  .qr-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .qr-frame {
+    position: relative;
+    padding: 28px;
+    background: white;
+    border-radius: 24px;
+    box-shadow:
+      0 0 0 1px rgba(245,200,66,0.3),
+      0 0 60px rgba(245,200,66,0.2),
+      0 20px 60px rgba(0,0,0,0.5);
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Animated corner brackets on QR */
+  .qr-frame::before, .qr-frame::after {
+    content: '';
+    position: absolute;
+    width: 24px; height: 24px;
+    border-color: var(--gold);
+    border-style: solid;
+    border-radius: 4px;
+  }
+  .qr-frame::before { top: -8px; left: -8px; border-width: 3px 0 0 3px; }
+  .qr-frame::after { bottom: -8px; right: -8px; border-width: 0 3px 3px 0; }
+
+  #qrcode canvas, #qrcode img {
+    display: block;
+    border-radius: 4px;
+  }
+
+  .qr-label {
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  .qr-label-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.5);
+  }
+
+  .qr-label-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  .url-display {
+    margin-top: 14px;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.05em;
+    word-break: break-all;
+    text-align: center;
+    max-width: 260px;
+  }
+
+  /* Right: live counter */
+  .live-block {
+    text-align: left;
+  }
+
+  .live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .live-dot {
+    width: 10px; height: 10px;
+    background: #ff4444;
+    border-radius: 50%;
+    animation: livepulse 1.2s ease-in-out infinite;
+    box-shadow: 0 0 12px rgba(255,68,68,0.6);
+  }
+
+  @keyframes livepulse {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 12px rgba(255,68,68,0.6); }
+    50% { opacity: 0.7; transform: scale(0.85); box-shadow: 0 0 6px rgba(255,68,68,0.3); }
+  }
+
+  .live-text {
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    color: #ff6666;
+    font-weight: 500;
+  }
+
+  .counter-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+
+  .counter-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 8px;
+  }
+
+  .counter-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(245,200,66,0.4);
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+  }
+
+  .counter-unit {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+  }
+
+  .time-box {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  .time-value {
+    font-size: 20px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Divider */
+  .vdivider {
+    width: 1px;
+    height: 280px;
+    background: linear-gradient(to bottom, transparent, rgba(245,200,66,0.3), transparent);
+  }
+
+  /* Bottom tagline */
+  .tagline {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.15);
+    white-space: nowrap;
+  }
+
+  /* URL editor */
+  .url-editor {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .url-editor input {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    width: 280px;
+    outline: none;
+    font-family: monospace;
+  }
+
+  .url-editor input:focus { border-color: var(--gold); }
+
+  .url-editor button {
+    background: rgba(245,200,66,0.15);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--gold);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .url-editor button:hover { background: rgba(245,200,66,0.25); }
+</style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+<div class="glow-bg"></div>
+
+<!-- Corner decorations -->
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- URL editor (for setup) -->
+<div class="url-editor">
+  <input type="text" id="url-input" placeholder="輸入投票頁面網址..." value="https://your-vote-url.com">
+  <button onclick="updateQR()">更新 QR</button>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Left: title -->
+  <div class="title-block">
+    <div class="event-label">2026 · 年度評審投票</div>
+    <div class="main-title">
+      候選人<br><span>投票</span>
+    </div>
+    <div class="desc">請評審掃描右方 QR Code<br>進入投票頁面，完成投票</div>
+    <div class="steps">
+      <div class="step">
+        <span>掃描 QR Code 進入頁面</span>
+        <div class="step-num">1</div>
+      </div>
+      <div class="step">
+        <span>輸入姓名與工號確認身份</span>
+        <div class="step-num">2</div>
+      </div>
+      <div class="step">
+        <span>選擇候選人完成投票</span>
+        <div class="step-num">3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: QR -->
+  <div class="qr-block">
+    <div class="qr-frame">
+      <div id="qrcode"></div>
+    </div>
+    <div class="qr-label">
+      <div class="qr-label-main">SCAN TO VOTE</div>
+      <div class="qr-label-sub">掃描此處開始投票</div>
+    </div>
+    <div class="url-display" id="url-display">https://your-vote-url.com</div>
+  </div>
+
+  <!-- Right: live stats -->
+  <div class="live-block">
+    <div class="live-indicator">
+      <div class="live-dot"></div>
+      <div class="live-text">LIVE</div>
+    </div>
+
+    <div class="counter-box">
+      <div class="counter-label">目前投票數</div>
+      <div class="counter-num" id="vote-counter">0</div>
+      <div class="counter-unit">票</div>
+    </div>
+
+    <div class="time-box">
+      <div>現在時間</div>
+      <div class="time-value" id="clock">00:00:00</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="tagline">匿名投票 · 即時統計 · 公正透明</div>
+
+<script>
+// ---- Stars ----
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 120; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s;opacity:${Math.random()*0.5}`;
+  starsEl.appendChild(s);
+}
+
+// ---- QR Code ----
+let currentUrl = 'https://your-vote-url.com';
+let qrInstance = null;
+
+function generateQR(url) {
+  document.getElementById('qrcode').innerHTML = '';
+  qrInstance = new QRCode(document.getElementById('qrcode'), {
+    text: url,
+    width: 220,
+    height: 220,
+    colorDark: '#1a1a2e',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H,
+  });
+  document.getElementById('url-display').textContent = url;
+}
+
+function updateQR() {
+  const val = document.getElementById('url-input').value.trim();
+  if (!val) return;
+  currentUrl = val;
+  generateQR(currentUrl);
+}
+
+generateQR(currentUrl);
+
+// ---- Clock ----
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ---- Sync vote count from localStorage (shared with voting page) ----
+function syncCount() {
+  try {
+    const data = JSON.parse(localStorage.getItem('voteSync') || '{"votes":{}}');
+    const total = Object.values(data.votes || {}).reduce((a,b) => a+b, 0);
+    document.getElementById('vote-counter').textContent = total;
+  } catch(e) {}
+}
+setInterval(syncCount, 1000);
+syncCount();
+</script>
+</body>
+</html>

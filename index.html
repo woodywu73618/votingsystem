@@ -6,1012 +6,293 @@
 <title>即時候選人投票系統</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
-
   :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: #2a2a3d;
-    --accent: #6c63ff;
-    --accent2: #ff6584;
-    --accent3: #43e97b;
-    --text: #e8e8f0;
-    --text-dim: #7070a0;
-    --card-shadow: 0 8px 32px rgba(108,99,255,0.15);
+    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d;
+    --accent: #6c63ff; --accent2: #ff6584; --accent3: #43e97b;
+    --text: #e8e8f0; --text-dim: #7070a0;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(108,99,255,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(255,101,132,0.06) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 32px 20px;
-  }
-
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 48px;
-  }
-
-  .header-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(108,99,255,0.15);
-    border: 1px solid rgba(108,99,255,0.3);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 12px;
-    color: #9d97ff;
-    letter-spacing: 0.1em;
-    margin-bottom: 20px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .live-dot {
-    width: 7px; height: 7px;
-    background: var(--accent3);
-    border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  h1 {
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 12px;
-  }
-
-  h1 span { color: var(--accent); }
-
-  .subtitle {
-    color: var(--text-dim);
-    font-size: 15px;
-  }
-
-  /* Tab nav */
-  .tab-nav {
-    display: flex;
-    gap: 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 4px;
-    margin-bottom: 32px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .tab-btn {
-    padding: 10px 28px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text-dim);
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .tab-btn.active {
-    background: var(--accent);
-    color: white;
-    box-shadow: 0 4px 16px rgba(108,99,255,0.4);
-  }
-
-  /* Identity form */
-  .identity-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 28px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-  }
-
-  .field-group {
-    flex: 1;
-    min-width: 180px;
-  }
-
-  label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input[type="text"]:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
-  }
-
-  input[type="text"]::placeholder { color: var(--text-dim); }
-
-  .confirm-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .confirm-btn:hover { background: #7c74ff; transform: translateY(-1px); }
-
-  .voter-info {
-    display: none;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-  }
-
-  .voter-avatar {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 18px;
-  }
-
-  .voter-name { font-weight: 700; font-size: 16px; }
-  .voter-id { font-size: 12px; color: var(--text-dim); font-family: 'Space Mono', monospace; }
-
-  .reset-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 16px;
-    color: var(--text-dim);
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
-
-  /* Candidates grid */
-  .candidates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .candidate-card {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    padding: 28px 24px;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .candidate-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(108,99,255,0.08), transparent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .candidate-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--card-shadow); }
-  .candidate-card:hover::before { opacity: 1; }
-
-  .candidate-card.voted {
-    border-color: var(--accent3);
-    background: rgba(67,233,123,0.05);
-  }
-
-  .candidate-card.voted::after {
-    content: '✓ 已投票';
-    position: absolute;
-    top: 14px; right: 14px;
-    background: var(--accent3);
-    color: #000;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 100px;
-  }
-
-  .candidate-card.disabled { opacity: 0.5; cursor: not-allowed; }
-  .candidate-card.disabled:hover { transform: none; border-color: var(--border); box-shadow: none; }
-
-  .candidate-number {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-bottom: 12px;
-    letter-spacing: 0.1em;
-  }
-
-  .candidate-emoji {
-    font-size: 40px;
-    margin-bottom: 12px;
-    display: block;
-  }
-
-  .candidate-name {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .candidate-desc {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.5;
-    margin-bottom: 20px;
-  }
-
-  /* Vote bar */
-  .vote-bar-container { margin-top: 8px; }
-
-  .vote-count-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 8px;
-  }
-
-  .vote-count {
-    font-family: 'Space Mono', monospace;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--accent);
-    transition: all 0.3s;
-  }
-
-  .vote-percent {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-
-  .vote-bar-track {
-    height: 6px;
-    background: var(--surface2);
-    border-radius: 100px;
-    overflow: hidden;
-  }
-
-  .vote-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), #9d97ff);
-    border-radius: 100px;
-    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .candidate-card.voted .vote-bar-fill {
-    background: linear-gradient(90deg, var(--accent3), #7affb3);
-  }
-
-  /* Vote button */
-  .vote-btn {
-    width: 100%;
-    margin-top: 16px;
-    background: linear-gradient(135deg, var(--accent), #9d97ff);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.05em;
-  }
-
-  .vote-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  /* Stats footer */
-  .stats-bar {
-    display: flex;
-    gap: 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 24px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
-
-  .stat-item { display: flex; align-items: center; gap: 10px; }
-
-  .stat-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent3);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .stat-label { font-size: 12px; color: var(--text-dim); }
-  .stat-value { font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; }
-
-  /* Admin panel */
-  .admin-panel { display: none; }
-
-  .admin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    flex-wrap: gap;
-  }
-
-  .admin-title {
-    font-size: 18px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .admin-badge {
-    background: var(--accent2);
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.1em;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .admin-login {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    text-align: center;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-
-  .admin-login h3 { font-size: 20px; margin-bottom: 8px; }
-  .admin-login p { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
-
-  .admin-input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    outline: none;
-    margin-bottom: 12px;
-    letter-spacing: 0.2em;
-    text-align: center;
-  }
-
-  .admin-input:focus { border-color: var(--accent2); }
-
-  .admin-login-btn {
-    width: 100%;
-    background: var(--accent2);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .admin-login-btn:hover { opacity: 0.9; }
-
-  /* Records table */
-  .records-table {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th {
-    background: var(--surface2);
-    padding: 14px 18px;
-    text-align: left;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-    font-family: 'Space Mono', monospace;
-    font-weight: 400;
-    border-bottom: 1px solid var(--border);
-  }
-
-  td {
-    padding: 14px 18px;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(42,42,61,0.5);
-  }
-
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(108,99,255,0.05); }
-
-  .candidate-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(108,99,255,0.15);
-    border: 1px solid rgba(108,99,255,0.3);
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 13px;
-    color: #9d97ff;
-  }
-
-  .time-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-dim);
-  }
-
-  .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
-  .empty-state p { font-size: 15px; }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface);
-    border: 1px solid var(--accent3);
-    border-radius: 12px;
-    padding: 14px 24px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: 1000;
-    white-space: nowrap;
-    color: var(--accent3);
-  }
-
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.error { border-color: var(--accent2); color: var(--accent2); }
-
-  /* Firebase notice */
-  .firebase-notice {
-    background: rgba(108,99,255,0.08);
-    border: 1px dashed rgba(108,99,255,0.3);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 28px;
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-
-  .firebase-notice strong { color: var(--accent); }
-  .firebase-notice code {
-    background: var(--surface2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: #9d97ff;
-  }
-
-  @keyframes countUp {
-    from { transform: translateY(10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  .count-animate { animation: countUp 0.3s ease-out; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans TC',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background: radial-gradient(ellipse 60% 40% at 20% 20%,rgba(108,99,255,.08) 0%,transparent 60%), radial-gradient(ellipse 50% 60% at 80% 80%,rgba(255,101,132,.06) 0%,transparent 60%); pointer-events:none; z-index:0; }
+  .container { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:32px 20px; }
+  .header { text-align:center; margin-bottom:48px; }
+  .header-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(108,99,255,.15); border:1px solid rgba(108,99,255,.3); border-radius:100px; padding:6px 16px; font-size:12px; color:#9d97ff; letter-spacing:.1em; margin-bottom:20px; font-family:'Space Mono',monospace; }
+  .live-dot { width:7px; height:7px; background:var(--accent3); border-radius:50%; animation:pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+  h1 { font-size:clamp(28px,5vw,48px); font-weight:900; letter-spacing:-.02em; line-height:1.1; margin-bottom:12px; }
+  h1 span { color:var(--accent); }
+  .subtitle { color:var(--text-dim); font-size:15px; }
+  .tab-nav { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:32px; width:fit-content; margin-left:auto; margin-right:auto; }
+  .tab-btn { padding:10px 28px; border-radius:8px; border:none; background:transparent; color:var(--text-dim); font-family:'Noto Sans TC',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all .2s; }
+  .tab-btn.active { background:var(--accent); color:white; box-shadow:0 4px 16px rgba(108,99,255,.4); }
+  .identity-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; margin-bottom:28px; display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap; }
+  .field-group { flex:1; min-width:180px; }
+  label { display:block; font-size:12px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:8px; font-family:'Space Mono',monospace; }
+  input[type="text"] { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; color:var(--text); font-family:'Noto Sans TC',sans-serif; font-size:15px; outline:none; transition:border-color .2s; }
+  input[type="text"]:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,.15); }
+  input[type="text"]::placeholder { color:var(--text-dim); }
+  .confirm-btn { background:var(--accent); color:white; border:none; border-radius:8px; padding:12px 24px; font-family:'Noto Sans TC',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .confirm-btn:hover { background:#7c74ff; transform:translateY(-1px); }
+  .voter-avatar { width:44px; height:44px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; flex-shrink:0; }
+  .voter-name { font-weight:700; font-size:16px; }
+  .voter-id { font-size:12px; color:var(--text-dim); font-family:'Space Mono',monospace; }
+  .reset-btn { background:transparent; border:1px solid var(--border); border-radius:8px; padding:8px 16px; color:var(--text-dim); font-family:'Noto Sans TC',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
+  .reset-btn:hover { border-color:var(--accent2); color:var(--accent2); }
+  .candidates-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:32px; }
+  .candidate-card { background:var(--surface); border:2px solid var(--border); border-radius:16px; padding:28px 24px; cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; }
+  .candidate-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(108,99,255,.08),transparent); opacity:0; transition:opacity .2s; }
+  .candidate-card:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:0 8px 32px rgba(108,99,255,.15); }
+  .candidate-card:hover::before { opacity:1; }
+  .candidate-card.voted { border-color:var(--accent3); background:rgba(67,233,123,.05); }
+  .candidate-card.voted::after { content:'✓ 已投票'; position:absolute; top:14px; right:14px; background:var(--accent3); color:#000; font-size:11px; font-weight:700; padding:4px 10px; border-radius:100px; }
+  .candidate-card.disabled { opacity:.5; cursor:not-allowed; }
+  .candidate-card.disabled:hover { transform:none; border-color:var(--border); box-shadow:none; }
+  .candidate-number { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:12px; letter-spacing:.1em; }
+  .candidate-emoji { font-size:40px; margin-bottom:12px; display:block; }
+  .candidate-name { font-size:20px; font-weight:700; margin-bottom:6px; }
+  .candidate-desc { font-size:13px; color:var(--text-dim); line-height:1.5; margin-bottom:20px; }
+  .vote-count-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .vote-count { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; color:var(--accent); transition:all .3s; }
+  .vote-percent { font-family:'Space Mono',monospace; font-size:12px; color:var(--text-dim); }
+  .vote-bar-track { height:6px; background:var(--surface2); border-radius:100px; overflow:hidden; }
+  .vote-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),#9d97ff); border-radius:100px; transition:width .6s cubic-bezier(.34,1.56,.64,1); }
+  .candidate-card.voted .vote-bar-fill { background:linear-gradient(90deg,var(--accent3),#7affb3); }
+  .vote-btn { width:100%; margin-top:16px; background:linear-gradient(135deg,var(--accent),#9d97ff); color:white; border:none; border-radius:8px; padding:12px; font-family:'Noto Sans TC',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; letter-spacing:.05em; }
+  .vote-btn:hover { opacity:.9; transform:translateY(-1px); }
+  .vote-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+  .stats-bar { display:flex; gap:24px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 24px; margin-bottom:32px; flex-wrap:wrap; }
+  .stat-item { display:flex; align-items:center; gap:10px; }
+  .stat-dot { width:8px; height:8px; border-radius:50%; background:var(--accent3); animation:pulse 2s ease-in-out infinite; }
+  .stat-label { font-size:12px; color:var(--text-dim); }
+  .stat-value { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; }
+  .admin-panel { display:none; }
+  .admin-login { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:40px; text-align:center; max-width:400px; margin:0 auto; }
+  .admin-login h3 { font-size:20px; margin-bottom:8px; }
+  .admin-login p { color:var(--text-dim); font-size:14px; margin-bottom:24px; }
+  .admin-input { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; color:var(--text); font-family:'Space Mono',monospace; font-size:14px; outline:none; margin-bottom:12px; letter-spacing:.2em; text-align:center; }
+  .admin-input:focus { border-color:var(--accent2); }
+  .admin-login-btn { width:100%; background:var(--accent2); color:white; border:none; border-radius:8px; padding:12px; font-family:'Noto Sans TC',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; }
+  .admin-login-btn:hover { opacity:.9; }
+  .admin-title { font-size:18px; font-weight:700; display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+  .admin-badge { background:var(--accent2); color:white; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; letter-spacing:.1em; font-family:'Space Mono',monospace; }
+  .records-table { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  th { background:var(--surface2); padding:14px 18px; text-align:left; font-size:11px; letter-spacing:.1em; color:var(--text-dim); font-family:'Space Mono',monospace; font-weight:400; border-bottom:1px solid var(--border); }
+  td { padding:14px 18px; font-size:14px; border-bottom:1px solid rgba(42,42,61,.5); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(108,99,255,.05); }
+  .candidate-tag { display:inline-flex; align-items:center; gap:6px; background:rgba(108,99,255,.15); border:1px solid rgba(108,99,255,.3); border-radius:6px; padding:3px 10px; font-size:13px; color:#9d97ff; }
+  .time-text { font-family:'Space Mono',monospace; font-size:12px; color:var(--text-dim); }
+  .empty-state { text-align:center; padding:60px 20px; color:var(--text-dim); }
+  .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--surface); border:1px solid var(--accent3); border-radius:12px; padding:14px 24px; font-size:14px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,.4); transition:transform .4s cubic-bezier(.34,1.56,.64,1); z-index:1000; white-space:nowrap; color:var(--accent3); }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  .toast.error { border-color:var(--accent2); color:var(--accent2); }
+  .connecting { text-align:center; padding:40px; color:var(--text-dim); font-size:14px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .spinner { width:24px; height:24px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 12px; }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <!-- Header -->
   <div class="header">
-    <div class="header-badge">
-      <div class="live-dot"></div>
-      LIVE VOTING · 即時投票
-    </div>
+    <div class="header-badge"><div class="live-dot"></div>LIVE VOTING · 即時投票</div>
     <h1>候選人<span>投票系統</span></h1>
     <p class="subtitle">即時同步 · 匿名顯示 · 安全記錄</p>
   </div>
-
-  <!-- Firebase Notice -->
-  <div class="firebase-notice">
-    💡 <strong>Demo 模式</strong>：目前使用瀏覽器本地模擬即時同步。
-    實際部署時，將資料庫操作替換為 Firebase Realtime Database，
-    監聽 <code>votes/</code> 路徑即可獲得真正跨裝置同步。
-    <a href="#firebase-guide" style="color: var(--accent); margin-left:8px;">查看接入說明 ↓</a>
-  </div>
-
-  <!-- Tabs -->
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('vote')">🗳️ 投票</button>
-    <button class="tab-btn" onclick="switchTab('admin')">🔐 後台</button>
+    <button class="tab-btn active" id="tab-vote" onclick="switchTab('vote',this)">🗳️ 投票</button>
+    <button class="tab-btn" id="tab-admin" onclick="switchTab('admin',this)">🔐 後台</button>
   </div>
-
-  <!-- === VOTE PANEL === -->
   <div id="vote-panel">
-
-    <!-- Identity card -->
     <div class="identity-card" id="identity-form-wrapper">
-      <div class="field-group">
-        <label>姓名 NAME</label>
-        <input type="text" id="input-name" placeholder="請輸入您的姓名" maxlength="20">
-      </div>
-      <div class="field-group">
-        <label>工號 EMPLOYEE ID</label>
-        <input type="text" id="input-empid" placeholder="例：EMP001" maxlength="20">
-      </div>
+      <div class="field-group"><label>姓名 NAME</label><input type="text" id="input-name" placeholder="請輸入您的姓名" maxlength="20"></div>
+      <div class="field-group"><label>工號 EMPLOYEE ID</label><input type="text" id="input-empid" placeholder="例：EMP001" maxlength="20"></div>
       <button class="confirm-btn" onclick="confirmIdentity()">確認身份 →</button>
     </div>
-
     <div class="identity-card" id="voter-info-bar" style="display:none;">
-      <div class="voter-info" style="display:flex;">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;">
         <div class="voter-avatar" id="voter-avatar-initial">王</div>
-        <div>
-          <div class="voter-name" id="voter-display-name">王小明</div>
-          <div class="voter-id" id="voter-display-id">EMP001</div>
-        </div>
+        <div><div class="voter-name" id="voter-display-name"></div><div class="voter-id" id="voter-display-id"></div></div>
       </div>
       <button class="reset-btn" onclick="resetIdentity()">更換身份</button>
     </div>
-
-    <!-- Stats -->
     <div class="stats-bar">
-      <div class="stat-item">
-        <div class="stat-dot"></div>
-        <div>
-          <div class="stat-label">總投票數</div>
-          <div class="stat-value" id="total-votes">0</div>
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-dot" style="background:var(--accent); animation-delay:0.5s;"></div>
-        <div>
-          <div class="stat-label">參與人數</div>
-          <div class="stat-value" id="total-voters">0</div>
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-dot" style="background:var(--accent2); animation-delay:1s;"></div>
-        <div>
-          <div class="stat-label">最後更新</div>
-          <div class="stat-value" id="last-update" style="font-size:12px;">—</div>
-        </div>
-      </div>
+      <div class="stat-item"><div class="stat-dot"></div><div><div class="stat-label">總投票數</div><div class="stat-value" id="total-votes">0</div></div></div>
+      <div class="stat-item"><div class="stat-dot" style="background:var(--accent);animation-delay:.5s"></div><div><div class="stat-label">參與人數</div><div class="stat-value" id="total-voters">0</div></div></div>
+      <div class="stat-item"><div class="stat-dot" style="background:var(--accent2);animation-delay:1s"></div><div><div class="stat-label">最後更新</div><div class="stat-value" id="last-update" style="font-size:12px">—</div></div></div>
     </div>
-
-    <!-- Candidates grid -->
-    <div class="candidates-grid" id="candidates-grid">
-      <!-- Generated by JS -->
-    </div>
-
+    <div id="connecting" class="connecting"><div class="spinner"></div>連線中...</div>
+    <div class="candidates-grid" id="candidates-grid"></div>
   </div>
-
-  <!-- === ADMIN PANEL === -->
   <div id="admin-panel" class="admin-panel">
-
     <div id="admin-login-view">
       <div class="admin-login">
-        <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+        <div style="font-size:48px;margin-bottom:16px">🔐</div>
         <h3>後台管理登入</h3>
         <p>輸入管理員密碼以查看完整投票紀錄</p>
         <input type="password" class="admin-input" id="admin-pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
         <button class="admin-login-btn" onclick="adminLogin()">登入後台</button>
-        <p style="font-size:12px;color:var(--text-dim);margin-top:16px;">Demo 密碼：<code style="font-family:Space Mono;background:var(--surface2);padding:2px 6px;border-radius:4px;">admin123</code></p>
+        <p style="font-size:12px;color:var(--text-dim);margin-top:16px">Demo 密碼：<code style="font-family:Space Mono;background:var(--surface2);padding:2px 6px;border-radius:4px">admin123</code></p>
       </div>
     </div>
-
-    <div id="admin-dashboard" style="display:none;">
-      <div class="admin-header">
-        <div class="admin-title">
-          完整投票紀錄
-          <span class="admin-badge">ADMIN</span>
-        </div>
+    <div id="admin-dashboard" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="admin-title">完整投票紀錄 <span class="admin-badge">ADMIN</span></div>
         <button class="reset-btn" onclick="adminLogout()">登出</button>
       </div>
-
-      <!-- Admin stats -->
-      <div class="stats-bar" style="margin-bottom:20px;">
-        <div class="stat-item">
-          <div class="stat-dot"></div>
-          <div>
-            <div class="stat-label">總票數</div>
-            <div class="stat-value" id="admin-total">0</div>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-dot" style="background:var(--accent2);"></div>
-          <div>
-            <div class="stat-label">投票人數</div>
-            <div class="stat-value" id="admin-voters">0</div>
-          </div>
-        </div>
+      <div class="stats-bar" style="margin-bottom:20px">
+        <div class="stat-item"><div class="stat-dot"></div><div><div class="stat-label">總票數</div><div class="stat-value" id="admin-total">0</div></div></div>
+        <div class="stat-item"><div class="stat-dot" style="background:var(--accent2)"></div><div><div class="stat-label">投票人數</div><div class="stat-value" id="admin-voters">0</div></div></div>
       </div>
-
       <div class="records-table">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>姓名</th>
-              <th>工號</th>
-              <th>投票給</th>
-              <th>時間</th>
-            </tr>
-          </thead>
-          <tbody id="records-tbody">
-          </tbody>
-        </table>
-        <div id="empty-state" class="empty-state" style="display:none;">
-          <div class="empty-state-icon">📭</div>
-          <p>尚無投票紀錄</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Firebase Guide -->
-  <div id="firebase-guide" style="margin-top:48px;">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;">
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">🔥 如何接入 Firebase（5 步驟）</h3>
-      <div style="display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.8;color:var(--text-dim);">
-        <div><strong style="color:var(--text);">① 建立 Firebase 專案</strong><br>前往 <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent);">console.firebase.google.com</a>，新增專案</div>
-        <div><strong style="color:var(--text);">② 啟用 Realtime Database</strong><br>選擇「以測試模式開始」，取得資料庫 URL</div>
-        <div><strong style="color:var(--text);">③ 替換連線設定</strong><br>將頁面 JS 中的 <code style="font-family:Space Mono;background:var(--surface2);padding:2px 6px;border-radius:4px;">FIREBASE_URL</code> 換成你的資料庫 URL</div>
-        <div><strong style="color:var(--text);">④ 寫入票數用 Transaction（防止競爭）</strong><br><code style="font-family:Space Mono;background:var(--surface2);padding:2px 6px;border-radius:4px;">db.ref('votes/候選人').transaction(v => v + 1)</code></div>
-        <div><strong style="color:var(--text);">⑤ 設定 Security Rules</strong><br>讓 <code style="font-family:Space Mono;background:var(--surface2);padding:2px 6px;border-radius:4px;">votes/</code> 公開可讀，<code style="font-family:Space Mono;background:var(--surface2);padding:2px 6px;border-radius:4px;">vote_records/</code> 僅管理員可讀</div>
+        <table><thead><tr><th>#</th><th>姓名</th><th>工號</th><th>投票給</th><th>時間</th></tr></thead>
+        <tbody id="records-tbody"></tbody></table>
+        <div id="empty-state" class="empty-state" style="display:none"><div style="font-size:48px;margin-bottom:16px">📭</div><p>尚無投票紀錄</p></div>
       </div>
     </div>
   </div>
-
 </div>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-// ============================================================
-// STATE
-// ============================================================
-const ADMIN_PASSWORD = 'admin123';
-
-const candidates = [
-  { id: 'A', emoji: '🦁', name: '張志明', desc: '主張創新科技導向，提升工作效率' },
-  { id: 'B', emoji: '🦊', name: '李美玲', desc: '著重團隊文化建設與員工福利' },
-  { id: 'C', emoji: '🐬', name: '王大偉', desc: '強調永續發展與社會責任' },
-];
-
-let state = {
-  voter: null,        // { name, empId }
-  hasVoted: false,
-  votedFor: null,
-  votes: { A: 0, B: 0, C: 0 },
-  records: [],        // [{ name, empId, candidateId, time }]
-  adminLoggedIn: false,
+const firebaseConfig = {
+  apiKey: "AIzaSyA2ZpeIZDLEpysnECE0WMvYoUkbrZ-SnK8",
+  authDomain: "voting-system-6629b.firebaseapp.com",
+  databaseURL: "https://voting-system-6629b-default-rtdb.firebaseio.com",
+  projectId: "voting-system-6629b",
+  storageBucket: "voting-system-6629b.firebasestorage.app",
+  messagingSenderId: "769201801560",
+  appId: "1:769201801560:web:f4144db3ad9310855cbd2d"
 };
-
-// Load persisted state from sessionStorage (simulates multi-tab)
-function loadState() {
-  try {
-    const saved = sessionStorage.getItem('voteState');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state.votes = parsed.votes || { A: 0, B: 0, C: 0 };
-      state.records = parsed.records || [];
-    }
-  } catch(e) {}
-}
-
-function saveState() {
-  sessionStorage.setItem('voteState', JSON.stringify({
-    votes: state.votes,
-    records: state.records,
-  }));
-  // Simulate broadcast to other tabs
-  localStorage.setItem('voteSync', JSON.stringify({ votes: state.votes, t: Date.now() }));
-}
-
-// Listen for "real-time" updates from other tabs
-window.addEventListener('storage', (e) => {
-  if (e.key === 'voteSync') {
-    try {
-      const data = JSON.parse(e.newValue);
-      state.votes = data.votes;
-      // Reload records
-      const saved = sessionStorage.getItem('voteState');
-      if (saved) state.records = JSON.parse(saved).records || [];
-      renderCandidates();
-      updateStats();
-      showToast('🔄 即時同步更新！', false);
-    } catch(e) {}
-  }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const ADMIN_PASSWORD = 'admin123';
+const CANDIDATES = [
+  { id:'A', emoji:'🦁', name:'張志明', desc:'主張創新科技導向，提升工作效率' },
+  { id:'B', emoji:'🦊', name:'李美玲', desc:'著重團隊文化建設與員工福利' },
+  { id:'C', emoji:'🐬', name:'王大偉', desc:'強調永續發展與社會責任' },
+];
+let state = { voter:null, hasVoted:false, votedFor:null, votes:{A:0,B:0,C:0}, recordCount:0, records:[] };
+let adminLoggedIn = false;
+db.ref('votes').on('value', snap => {
+  const v = snap.val() || {};
+  state.votes = { A: v.A||0, B: v.B||0, C: v.C||0 };
+  document.getElementById('connecting').style.display = 'none';
+  renderCandidates();
+  updateStats();
+  document.getElementById('last-update').textContent = new Date().toLocaleTimeString('zh-TW');
 });
-
-// ============================================================
-// IDENTITY
-// ============================================================
+db.ref('vote_records').on('value', snap => {
+  const data = snap.val() || {};
+  state.records = Object.values(data).sort((a,b) => b.timestamp - a.timestamp);
+  state.recordCount = state.records.length;
+  updateStats();
+  if (adminLoggedIn) renderRecords();
+});
 function confirmIdentity() {
   const name = document.getElementById('input-name').value.trim();
   const empId = document.getElementById('input-empid').value.trim();
-
-  if (!name || !empId) {
-    showToast('請填寫姓名與工號', true);
-    return;
-  }
-
-  // Check if this empId already voted
+  if (!name || !empId) { showToast('請填寫姓名與工號', true); return; }
   const existing = state.records.find(r => r.empId === empId);
+  state.voter = { name, empId };
   if (existing) {
-    state.voter = { name, empId };
-    state.hasVoted = true;
-    state.votedFor = existing.candidateId;
-    showToast(`工號 ${empId} 已投票給 ${candidates.find(c=>c.id===existing.candidateId)?.name}`, true);
-  } else {
-    state.voter = { name, empId };
-    state.hasVoted = false;
-    state.votedFor = null;
-  }
-
+    state.hasVoted = true; state.votedFor = existing.candidateId;
+    showToast(`工號 ${empId} 已投票給 ${CANDIDATES.find(c=>c.id===existing.candidateId)?.name}`, true);
+  } else { state.hasVoted = false; state.votedFor = null; }
   document.getElementById('identity-form-wrapper').style.display = 'none';
   document.getElementById('voter-info-bar').style.display = 'flex';
   document.getElementById('voter-display-name').textContent = name;
   document.getElementById('voter-display-id').textContent = empId;
   document.getElementById('voter-avatar-initial').textContent = name.charAt(0);
-
   renderCandidates();
 }
-
 function resetIdentity() {
-  state.voter = null;
-  state.hasVoted = false;
-  state.votedFor = null;
+  state.voter = null; state.hasVoted = false; state.votedFor = null;
   document.getElementById('identity-form-wrapper').style.display = 'flex';
   document.getElementById('voter-info-bar').style.display = 'none';
   document.getElementById('input-name').value = '';
   document.getElementById('input-empid').value = '';
   renderCandidates();
 }
-
-// ============================================================
-// VOTING
-// ============================================================
-function castVote(candidateId) {
+async function castVote(candidateId) {
   if (!state.voter) { showToast('請先確認身份', true); return; }
   if (state.hasVoted) { showToast('您已投票，每人限投一次', true); return; }
-
-  const candidate = candidates.find(c => c.id === candidateId);
-
-  // Update votes
-  state.votes[candidateId]++;
-  state.hasVoted = true;
-  state.votedFor = candidateId;
-
-  // Record identity (backend only visible)
-  state.records.push({
-    name: state.voter.name,
-    empId: state.voter.empId,
-    candidateId,
-    candidateName: candidate.name,
-    time: new Date().toLocaleString('zh-TW'),
-  });
-
-  saveState();
-  renderCandidates();
-  updateStats();
-  showToast(`✅ 成功投票給 ${candidate.name}！`);
-
-  // If admin is open, refresh
-  if (state.adminLoggedIn) renderRecords();
+  const candidate = CANDIDATES.find(c => c.id === candidateId);
+  try {
+    await db.ref(`votes/${candidateId}`).transaction(v => (v||0) + 1);
+    await db.ref('vote_records').push({
+      name: state.voter.name, empId: state.voter.empId,
+      candidateId, candidateName: candidate.name,
+      timestamp: Date.now(), time: new Date().toLocaleString('zh-TW')
+    });
+    state.hasVoted = true; state.votedFor = candidateId;
+    renderCandidates();
+    showToast(`✅ 成功投票給 ${candidate.name}！`);
+  } catch(e) { showToast('投票失敗，請重試', true); }
 }
-
-// ============================================================
-// RENDER
-// ============================================================
 function renderCandidates() {
   const grid = document.getElementById('candidates-grid');
-  const totalVotes = Object.values(state.votes).reduce((a,b) => a+b, 0);
-
-  grid.innerHTML = candidates.map(c => {
-    const count = state.votes[c.id] || 0;
-    const pct = totalVotes > 0 ? Math.round(count / totalVotes * 100) : 0;
-    const isVoted = state.hasVoted && state.votedFor === c.id;
-    const isDisabled = state.hasVoted && !isVoted;
-    const noIdentity = !state.voter;
-
-    return `
-      <div class="candidate-card ${isVoted ? 'voted' : ''} ${isDisabled || noIdentity ? 'disabled' : ''}"
-           onclick="${(!isDisabled && !noIdentity && !state.hasVoted) ? `castVote('${c.id}')` : ''}">
-        <div class="candidate-number">NO. ${c.id}</div>
-        <span class="candidate-emoji">${c.emoji}</span>
-        <div class="candidate-name">${c.name}</div>
-        <div class="candidate-desc">${c.desc}</div>
-        <div class="vote-bar-container">
-          <div class="vote-count-row">
-            <span class="vote-count" id="count-${c.id}">${count}</span>
-            <span class="vote-percent">${pct}%</span>
-          </div>
-          <div class="vote-bar-track">
-            <div class="vote-bar-fill" style="width:${pct}%"></div>
-          </div>
-        </div>
-        ${!state.hasVoted && state.voter ? `<button class="vote-btn" onclick="event.stopPropagation();castVote('${c.id}')">投票給 ${c.name}</button>` : ''}
-      </div>
-    `;
+  const total = Object.values(state.votes).reduce((a,b)=>a+b,0);
+  grid.innerHTML = CANDIDATES.map(c => {
+    const count = state.votes[c.id]||0, pct = total>0?Math.round(count/total*100):0;
+    const isVoted = state.hasVoted && state.votedFor===c.id;
+    const isDisabled = state.hasVoted && !isVoted, noId = !state.voter;
+    return `<div class="candidate-card ${isVoted?'voted':''} ${isDisabled||noId?'disabled':''}">
+      <div class="candidate-number">NO. ${c.id}</div>
+      <span class="candidate-emoji">${c.emoji}</span>
+      <div class="candidate-name">${c.name}</div>
+      <div class="candidate-desc">${c.desc}</div>
+      <div><div class="vote-count-row"><span class="vote-count">${count}</span><span class="vote-percent">${pct}%</span></div>
+      <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%"></div></div></div>
+      ${(!state.hasVoted && state.voter)?`<button class="vote-btn" onclick="castVote('${c.id}')">投票給 ${c.name}</button>`:''}
+    </div>`;
   }).join('');
 }
-
 function updateStats() {
-  const total = Object.values(state.votes).reduce((a,b) => a+b, 0);
+  const total = Object.values(state.votes).reduce((a,b)=>a+b,0);
   document.getElementById('total-votes').textContent = total;
-  document.getElementById('total-voters').textContent = state.records.length;
-  document.getElementById('last-update').textContent = new Date().toLocaleTimeString('zh-TW');
+  document.getElementById('total-voters').textContent = state.recordCount;
 }
-
-// ============================================================
-// ADMIN
-// ============================================================
 function adminLogin() {
-  const pwd = document.getElementById('admin-pwd-input').value;
-  if (pwd === ADMIN_PASSWORD) {
-    state.adminLoggedIn = true;
+  if (document.getElementById('admin-pwd-input').value === ADMIN_PASSWORD) {
+    adminLoggedIn = true;
     document.getElementById('admin-login-view').style.display = 'none';
     document.getElementById('admin-dashboard').style.display = 'block';
     renderRecords();
-  } else {
-    showToast('密碼錯誤', true);
-  }
+  } else { showToast('密碼錯誤', true); }
 }
-
 function adminLogout() {
-  state.adminLoggedIn = false;
+  adminLoggedIn = false;
   document.getElementById('admin-login-view').style.display = 'block';
   document.getElementById('admin-dashboard').style.display = 'none';
   document.getElementById('admin-pwd-input').value = '';
 }
-
 function renderRecords() {
-  const tbody = document.getElementById('records-tbody');
-  const empty = document.getElementById('empty-state');
-
   document.getElementById('admin-total').textContent = Object.values(state.votes).reduce((a,b)=>a+b,0);
   document.getElementById('admin-voters').textContent = state.records.length;
-
-  if (state.records.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-
+  const tbody = document.getElementById('records-tbody');
+  const empty = document.getElementById('empty-state');
+  if (!state.records.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display = 'none';
-  const c = candidates;
-  tbody.innerHTML = [...state.records].reverse().map((r, i) => {
-    const cand = c.find(x => x.id === r.candidateId);
-    return `
-      <tr>
-        <td class="time-text">${state.records.length - i}</td>
-        <td><strong>${r.name}</strong></td>
-        <td class="time-text">${r.empId}</td>
-        <td><span class="candidate-tag">${cand?.emoji || ''} ${r.candidateName}</span></td>
-        <td class="time-text">${r.time}</td>
-      </tr>
-    `;
+  tbody.innerHTML = state.records.map((r,i) => {
+    const cand = CANDIDATES.find(x=>x.id===r.candidateId);
+    return `<tr><td class="time-text">${state.records.length-i}</td><td><strong>${r.name}</strong></td><td class="time-text">${r.empId}</td><td><span class="candidate-tag">${cand?.emoji||''} ${r.candidateName}</span></td><td class="time-text">${r.time}</td></tr>`;
   }).join('');
 }
-
-// ============================================================
-// TAB SWITCH
-// ============================================================
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-
-  document.getElementById('vote-panel').style.display = tab === 'vote' ? 'block' : 'none';
-  document.getElementById('admin-panel').style.display = tab === 'admin' ? 'block' : 'none';
-
-  if (tab === 'admin') document.getElementById('admin-panel').classList.add('admin-panel');
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('vote-panel').style.display = tab==='vote'?'block':'none';
+  document.getElementById('admin-panel').style.display = tab==='admin'?'block':'none';
 }
-
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg, isError = false) {
+function showToast(msg, isError=false) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (isError ? ' error' : '');
-  setTimeout(() => t.classList.add('show'), 10);
-  setTimeout(() => t.classList.remove('show'), 3000);
+  t.textContent = msg; t.className = 'toast'+(isError?' error':'');
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-// ============================================================
-// INIT
-// ============================================================
-loadState();
 renderCandidates();
-updateStats();
-
-// Simulate periodic "live" update indicator
-setInterval(() => {
-  document.getElementById('last-update').textContent = new Date().toLocaleTimeString('zh-TW');
-}, 10000);
 </script>
 </body>
 </html>

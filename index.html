@@ -2,628 +2,199 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>JENTECH 人評會投票</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投票系統</title>
 
-:root {
-  --bg: #f5f6fa;
-  --sf: #ffffff;
-  --sf2: #f0f1f7;
-  --sf3: #e8e9f3;
-  --bd: #e0e1ee;
-  --ac: #6c63ff;
-  --ac2: #ff6584;
-  --ac3: #22c55e;
-  --gold: #f59e0b;
-  --tx: #1a1a2e;
-  --txd: #8888aa;
-  --nav-h: 68px;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'Noto Sans TC', sans-serif;
-  background: var(--bg);
-  color: var(--tx);
-  min-height: 100vh;
-  overflow-x: hidden;
-  padding-bottom: var(--nav-h);
-}
-
-#login-screen {
-  position: fixed; inset: 0;
-  background: #ffffff;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 24px;
-}
-
-#login-screen::before {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(108,99,255,.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 30% at 100% 100%, rgba(255,101,132,.04) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.login-box {
-  position: relative; z-index: 1;
-  width: 100%; max-width: 400px;
-  text-align: center;
-}
-
-.login-logo-area {
-  margin-bottom: 32px;
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-}
-
-.company-logo-placeholder {
-  width: 120px; height: 48px;
-  background: linear-gradient(135deg, var(--ac), #8b83ff);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 900; color: white;
-  letter-spacing: .1em;
-}
-
-.login-title { font-size: 20px; font-weight: 900; color: var(--tx); margin-bottom: 2px; }
-.login-title span { color: var(--ac); }
-.login-sub { font-size: 13px; color: var(--txd); margin-bottom: 32px; }
-.login-form { display: flex; flex-direction: column; gap: 14px; }
-.login-field { text-align: left; }
-.login-label { display: block; font-size: 11px; color: var(--txd); letter-spacing: .08em; margin-bottom: 6px; font-family: 'Space Mono', monospace; }
-.login-input { width: 100%; background: var(--sf2); border: 1.5px solid var(--bd); border-radius: 12px; padding: 14px 16px; color: var(--tx); font-family: 'Noto Sans TC', sans-serif; font-size: 16px; outline: none; transition: all .2s; }
-.login-input:focus { border-color: var(--ac); box-shadow: 0 0 0 3px rgba(108,99,255,.12); background: #fff; }
-.login-input::placeholder { color: var(--txd); }
-.login-btn { width: 100%; background: linear-gradient(135deg, var(--ac), #8b83ff); color: white; border: none; border-radius: 12px; padding: 15px; font-family: 'Noto Sans TC', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .2s; margin-top: 4px; box-shadow: 0 4px 20px rgba(108,99,255,.25); }
-.login-btn:hover { transform: translateY(-1px); }
-.login-note { font-size: 11px; color: var(--txd); margin-top: 16px; }
-
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: #fff; border-top: 1px solid var(--bd); display: flex; align-items: center; justify-content: space-around; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,.06); }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 0; border: none; background: transparent; cursor: pointer; transition: all .2s; color: var(--txd); font-family: 'Noto Sans TC', sans-serif; position: relative; }
-.nav-btn.active { color: var(--ac); }
-.nav-icon { font-size: 22px; transition: transform .2s; }
-.nav-btn.active .nav-icon { transform: translateY(-2px); }
-.nav-label { font-size: 11px; font-weight: 600; letter-spacing: .03em; }
-.nav-indicator { position: absolute; top: 6px; width: 24px; height: 3px; border-radius: 100px; background: var(--ac); opacity: 0; transition: opacity .2s; }
-.nav-btn.active .nav-indicator { opacity: 1; }
-
-.page { display: none; min-height: calc(100vh - var(--nav-h)); }
-.page.active { display: block; }
-
-.page-header { padding: 20px 18px 14px; background: #fff; border-bottom: 1px solid var(--bd); position: sticky; top: 0; z-index: 10; }
-.page-title { font-size: 22px; font-weight: 900; letter-spacing: -.01em; color: var(--tx); }
-.page-title span { color: var(--ac); }
-.page-sub { font-size: 12px; color: var(--txd); margin-top: 2px; }
-
-.user-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--sf2); border-radius: 100px; padding: 5px 12px 5px 5px; margin-top: 10px; border: 1px solid var(--bd); }
-.user-av { width: 26px; height: 26px; background: linear-gradient(135deg, var(--ac), var(--ac2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
-.user-info { font-size: 12px; font-weight: 600; color: var(--tx); }
-.user-id-txt { font-size: 10px; color: var(--txd); font-family: 'Space Mono', monospace; }
-.logout-btn { margin-left: 4px; background: transparent; border: none; color: var(--txd); font-size: 11px; cursor: pointer; padding: 2px 6px; border-radius: 4px; font-family: 'Noto Sans TC', sans-serif; }
-.logout-btn:hover { color: var(--ac2); }
-
-.stats-row { display: flex; gap: 8px; padding: 14px 18px; overflow-x: auto; scrollbar-width: none; }
-.stats-row::-webkit-scrollbar { display: none; }
-.stat-chip { background: #fff; border: 1px solid var(--bd); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-.sdot { width: 6px; height: 6px; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
-.slabel { font-size: 10px; color: var(--txd); }
-.sval { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--tx); }
-
-.cards-list { padding: 0 16px 20px; display: flex; flex-direction: column; gap: 14px; }
-
-.cc { background: #fff; border: 2px solid var(--bd); border-radius: 18px; overflow: hidden; transition: border-color .3s; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
-.cc.voted-pass { border-color: var(--ac3); }
-.cc.voted-fail { border-color: var(--ac2); }
-.cc.voted-abs  { border-color: var(--gold); }
-
-.cc-head { background: var(--sf2); padding: 14px 16px; border-bottom: 1px solid var(--bd); display: flex; justify-content: space-between; align-items: flex-start; }
-.cc-case { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--txd); letter-spacing: .1em; margin-bottom: 3px; }
-.cc-name { font-size: 20px; font-weight: 900; color: var(--tx); }
-.cc-dept { font-size: 11px; color: var(--ac); font-weight: 500; margin-top: 2px; }
-.cc-empid { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--txd); }
-
-.my-vote-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-.mvb-pass { background: rgba(34,197,94,.1); color: var(--ac3); border: 1px solid rgba(34,197,94,.3); }
-.mvb-fail { background: rgba(255,101,132,.1); color: var(--ac2); border: 1px solid rgba(255,101,132,.3); }
-.mvb-abs  { background: rgba(245,158,11,.1); color: var(--gold); border: 1px solid rgba(245,158,11,.3); }
-
-.cc-body { padding: 14px 16px; }
-
-.info-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.pill { background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px; padding: 5px 10px; }
-.pill-label { color: var(--txd); font-size: 9px; font-family: 'Space Mono', monospace; letter-spacing: .05em; margin-bottom: 1px; }
-.pill-val { font-weight: 700; font-size: 12px; color: var(--tx); }
-.pill-val.gold { color: var(--gold); }
-.pill-val.red  { color: var(--ac2); }
-
-.promo-row { background: var(--sf2); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border: 1px solid var(--bd); }
-.ptag { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-.ptag-b { background: rgba(136,136,170,.12); color: var(--txd); }
-.ptag-a { background: rgba(245,158,11,.12); color: var(--gold); border: 1px solid rgba(245,158,11,.2); }
-.p-arrow { color: var(--gold); font-size: 16px; font-weight: 700; }
-.promo-type-tag { margin-left: auto; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 700; background: rgba(108,99,255,.1); color: var(--ac); }
-
-.vote-section { margin-bottom: 10px; }
-.vote-row-label { font-size: 10px; color: var(--txd); letter-spacing: .07em; margin-bottom: 8px; font-family: 'Space Mono', monospace; }
-.vote-btns { display: flex; gap: 8px; }
-.vbtn { flex: 1; border: none; border-radius: 10px; padding: 11px 6px; font-family: 'Noto Sans TC', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; border: 1.5px solid transparent; display: flex; align-items: center; justify-content: center; gap: 4px; }
-.vbtn.pass { background: rgba(34,197,94,.08); color: var(--ac3); border-color: rgba(34,197,94,.25); }
-.vbtn.pass.sel { background: var(--ac3); color: #fff; border-color: var(--ac3); }
-.vbtn.fail { background: rgba(255,101,132,.08); color: var(--ac2); border-color: rgba(255,101,132,.2); }
-.vbtn.fail.sel { background: var(--ac2); color: white; border-color: var(--ac2); }
-.vbtn.abs  { background: rgba(245,158,11,.08); color: var(--gold); border-color: rgba(245,158,11,.2); }
-.vbtn.abs.sel  { background: var(--gold); color: #fff; border-color: var(--gold); }
-
-.fail-reasons { background: rgba(255,101,132,.04); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; border: 1px solid rgba(255,101,132,.2); animation: slideDown .2s ease-out; }
-@keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-.fr-title { font-size: 10px; color: var(--ac2); letter-spacing: .07em; margin-bottom: 8px; font-family: 'Space Mono', monospace; }
-.fr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-.fr-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 7px; cursor: pointer; transition: background .15s; }
-.fr-item:hover { background: rgba(255,101,132,.08); }
-.fr-item input { width: 14px; height: 14px; accent-color: var(--ac2); flex-shrink: 0; cursor: pointer; }
-.fr-item label { cursor: pointer; color: var(--tx); margin: 0; font-family: 'Noto Sans TC', sans-serif; font-size: 12px; line-height: 1.3; }
-
-.res-wrap { margin-bottom: 10px; }
-.res-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-.res-lbl { font-size: 10px; color: var(--txd); }
-.res-nums { font-size: 11px; font-family: 'Space Mono', monospace; }
-.rn-p { color: var(--ac3); } .rn-f { color: var(--ac2); } .rn-a { color: var(--gold); }
-.res-bar { height: 6px; background: var(--sf2); border-radius: 100px; overflow: hidden; display: flex; }
-.rb-p { height: 100%; background: var(--ac3); transition: width .6s cubic-bezier(.34,1.56,.64,1); }
-.rb-f { height: 100%; background: var(--ac2); transition: width .6s cubic-bezier(.34,1.56,.64,1); }
-.rb-a { height: 100%; background: var(--gold); transition: width .6s cubic-bezier(.34,1.56,.64,1); }
-
-.submit-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--ac), #8b83ff); color: white; border: none; border-radius: 10px; font-family: 'Noto Sans TC', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; margin-top: 6px; box-shadow: 0 3px 12px rgba(108,99,255,.2); }
-.submit-btn:hover { opacity:.9; transform: translateY(-1px); }
-.no-cases { text-align: center; padding: 60px 20px; color: var(--txd); }
-
-.results-list { padding: 0 16px 20px; display: flex; flex-direction: column; gap: 14px; }
-.rc { background: #fff; border: 1px solid var(--bd); border-radius: 18px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
-.rc-accent-bar { height: 5px; background: var(--bd); transition: background .3s; }
-.rc.leading-pass .rc-accent-bar { background: linear-gradient(90deg, var(--ac3), #86efac); }
-.rc.leading-fail .rc-accent-bar { background: linear-gradient(90deg, var(--ac2), #fda4af); }
-.rc-inner { padding: 16px; }
-.rc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-.rc-name { font-size: 22px; font-weight: 900; color: var(--tx); line-height: 1.1; }
-.rc-dept { font-size: 12px; color: var(--ac); margin-top: 3px; font-weight: 500; }
-.rc-promo { font-size: 11px; color: var(--txd); margin-top: 4px; }
-.verdict-badge { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 100px; font-size: 13px; font-weight: 900; flex-shrink: 0; }
-.vb-pass { background: rgba(34,197,94,.12); color: var(--ac3); border: 1.5px solid rgba(34,197,94,.3); }
-.vb-fail { background: rgba(255,101,132,.1); color: var(--ac2); border: 1.5px solid rgba(255,101,132,.3); }
-.vb-tie  { background: rgba(245,158,11,.1); color: var(--gold); border: 1.5px solid rgba(245,158,11,.3); }
-.result-summary { display: flex; gap: 10px; margin-bottom: 12px; }
-.rs-item { flex: 1; background: var(--sf2); border-radius: 12px; padding: 12px 8px; text-align: center; border: 1px solid var(--bd); }
-.rs-count { font-family: 'Space Mono', monospace; font-size: 32px; font-weight: 700; line-height: 1; }
-.rs-label { font-size: 12px; color: var(--txd); margin-top: 4px; font-weight: 600; }
-.rs-pass .rs-count { color: var(--ac3); }
-.rs-fail .rs-count { color: var(--ac2); }
-.rs-abs  .rs-count { color: var(--gold); }
-.rc-bar { height: 8px; background: var(--sf2); border-radius: 100px; overflow: hidden; display: flex; }
-
-.settings-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-.settings-section { background: #fff; border: 1px solid var(--bd); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-.ss-title { font-size: 11px; color: var(--txd); letter-spacing: .1em; font-family: 'Space Mono', monospace; padding: 12px 16px 8px; }
-.admin-form { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
-.afg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.fg { min-width: 0; }
-.fg.full { grid-column: 1/-1; }
-input[type="text"], input[type="password"], select, textarea { font-family: 'Noto Sans TC', sans-serif; font-size: 13px; color: var(--tx); background: var(--sf2); border: 1.5px solid var(--bd); border-radius: 9px; outline: none; transition: border-color .2s; padding: 9px 12px; width: 100%; }
-input:focus, select:focus { border-color: var(--ac); box-shadow: 0 0 0 3px rgba(108,99,255,.1); }
-input::placeholder { color: var(--txd); }
-.field-label { font-size: 10px; color: var(--txd); letter-spacing: .07em; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
-.promo-form { background: var(--sf2); border-radius: 10px; padding: 11px; border: 1px solid var(--bd); }
-.pf-grid { display: grid; grid-template-columns: 1fr 20px 1fr; gap: 7px; margin-bottom: 6px; }
-.pf-arrow { display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 15px; font-weight: 700; }
-.pf-head { font-size: 9px; text-align: center; font-family: 'Space Mono', monospace; margin-bottom: 4px; color: var(--txd); }
-.pf-head.after { color: var(--gold); }
-.btn { border: none; border-radius: 10px; font-family: 'Noto Sans TC', sans-serif; font-weight: 700; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 5px; }
-.btn-p { background: var(--ac); color: white; padding: 10px 18px; font-size: 13px; }
-.btn-p:hover { background: #7c74ff; }
-.btn-d { background: rgba(255,101,132,.1); color: var(--ac2); border: 1px solid rgba(255,101,132,.3); padding: 7px 12px; font-size: 12px; }
-.btn-danger { background: rgba(255,101,132,.08); color: var(--ac2); border: 1px solid rgba(255,101,132,.2); border-radius: 12px; padding: 13px 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; text-align: left; display: flex; align-items: center; gap: 8px; }
-.acli { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--bd); }
-.acli-info { flex: 1; min-width: 0; }
-.acli-name { font-size: 13px; font-weight: 700; color: var(--tx); }
-.acli-sub { font-size: 11px; color: var(--txd); margin-top: 1px; }
-.acli-votes { font-size: 11px; text-align: right; line-height: 1.7; margin-right: 8px; flex-shrink: 0; font-family: 'Space Mono', monospace; }
-.rec-scroll { overflow-x: auto; padding: 0 16px 14px; }
-table { width: 100%; border-collapse: collapse; min-width: 500px; }
-th { padding: 8px 10px; text-align: left; font-size: 10px; letter-spacing: .08em; color: var(--txd); font-family: 'Space Mono', monospace; font-weight: 400; border-bottom: 1px solid var(--bd); }
-td { padding: 8px 10px; font-size: 11px; border-bottom: 1px solid var(--bd); vertical-align: top; color: var(--tx); }
-tr:last-child td { border-bottom: none; }
-.rtag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
-.rtag-p { background: rgba(34,197,94,.12); color: var(--ac3); }
-.rtag-f { background: rgba(255,101,132,.1); color: var(--ac2); }
-.rtag-a { background: rgba(245,158,11,.1); color: var(--gold); }
-.empty-s { text-align: center; padding: 28px; color: var(--txd); font-size: 12px; }
-.admin-login-inner { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-.toast { position: fixed; bottom: calc(var(--nav-h) + 14px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--tx); border-radius: 12px; padding: 11px 20px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,.15); transition: all .35s cubic-bezier(.34,1.56,.64,1); z-index: 150; white-space: nowrap; color: #fff; opacity: 0; pointer-events: none; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.error { background: var(--ac2); }
-.connecting { text-align: center; padding: 48px; color: var(--txd); font-size: 13px; }
-@keyframes spin { to{transform:rotate(360deg)} }
-.spinner { width: 22px; height: 22px; border: 2px solid var(--bd); border-top-color: var(--ac); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
-</style>
-</head>
-<body>
-
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo-area">
-      <div class="company-logo-placeholder">JENTECH</div>
-      <div>
-        <div class="login-title">人評會<span>投票系統</span></div>
-        <div style="font-size:11px;color:var(--txd);text-align:center;">Promotion Review Committee</div>
-      </div>
-    </div>
-    <div class="login-sub">請輸入身份資料以進入投票</div>
-    <div class="login-form">
-      <div class="login-field">
-        <label class="login-label">姓名 NAME</label>
-        <input type="text" class="login-input" id="li-name" placeholder="請輸入您的姓名" maxlength="20" onkeydown="if(event.key==='Enter')document.getElementById('li-empid').focus()">
-      </div>
-      <div class="login-field">
-        <label class="login-label">工號 EMPLOYEE ID</label>
-        <input type="text" class="login-input" id="li-empid" placeholder="例：EMP001" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <button class="login-btn" onclick="doLogin()">進入投票系統 →</button>
-    </div>
-    <div class="login-note">每人每個案件可投票一次，投票後可修改</div>
-  </div>
-</div>
-
-<div id="app" style="display:none;">
-  <div class="page active" id="page-vote">
-    <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
-        <div>
-          <div class="page-title">人員晉升<span>投票</span></div>
-          <div class="page-sub">每個案件可個別投票，投後可修改</div>
-        </div>
-        <div class="user-chip">
-          <div class="user-av" id="uav1"></div>
-          <div>
-            <div class="user-info" id="uname1"></div>
-            <div class="user-id-txt" id="uid1"></div>
-          </div>
-          <button class="logout-btn" onclick="doLogout()">登出</button>
-        </div>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-chip"><div class="sdot" style="background:var(--ac3)"></div><div><div class="slabel">總票數</div><div class="sval" id="sv-total">0</div></div></div>
-      <div class="stat-chip"><div class="sdot" style="background:var(--ac);animation-delay:.5s"></div><div><div class="slabel">參與委員</div><div class="sval" id="sv-voters">0</div></div></div>
-      <div class="stat-chip"><div class="sdot" style="background:var(--gold);animation-delay:1s"></div><div><div class="slabel">審核案件</div><div class="sval" id="sv-cands">0</div></div></div>
-    </div>
-    <div id="connecting" class="connecting"><div class="spinner"></div>載入資料中...</div>
-    <div class="cards-list" id="cards-list"></div>
-  </div>
-
-  <div class="page" id="page-results">
-    <div class="page-header">
-      <div class="page-title">即時<span>結果</span></div>
-      <div class="page-sub">匿名統計 · 自動更新</div>
-    </div>
-    <div class="results-list" id="results-list" style="margin-top:14px;"></div>
-  </div>
-
-  <div class="page" id="page-settings">
-    <div class="page-header">
-      <div class="page-title"><span>設定</span></div>
-      <div class="page-sub">後台管理</div>
-    </div>
-    <div class="settings-body">
-      <div class="settings-section" id="admin-login-section">
-        <div class="ss-title">後台管理員登入</div>
-        <div class="admin-login-inner">
-          <input type="password" id="admin-pw" placeholder="輸入管理員密碼" onkeydown="if(event.key==='Enter')adminLogin()">
-          <button class="btn btn-p" style="width:100%;justify-content:center;" onclick="adminLogin()">登入管理後台</button>
-          <div style="font-size:11px;color:var(--txd);">預設密碼：<code style="font-family:Space Mono;background:var(--sf2);padding:1px 5px;border-radius:3px;">admin123</code></div>
-        </div>
-      </div>
-      <div id="admin-dash" style="display:none;flex-direction:column;gap:12px;">
-        <div class="settings-section">
-          <div class="ss-title" style="display:flex;justify-content:space-between;align-items:center;padding-right:16px;">
-            管理員已登入 <button class="logout-btn" onclick="adminLogout()">登出</button>
-          </div>
-        </div>
-        <div class="settings-section">
-          <div class="ss-title">➕ 新增審核案件</div>
-          <div class="admin-form">
-            <div class="afg">
-              <div class="fg"><div class="field-label">工號 *</div><input type="text" id="n-empid" placeholder="員工工號"></div>
-              <div class="fg"><div class="field-label">姓名 *</div><input type="text" id="n-name" placeholder="員工姓名"></div>
-              <div class="fg"><div class="field-label">處</div><input type="text" id="n-div" placeholder="例：研發一處"></div>
-              <div class="fg"><div class="field-label">部</div><input type="text" id="n-dept" placeholder="例：複合沖壓部"></div>
-              <div class="fg full"><div class="field-label">課</div><input type="text" id="n-sec" placeholder="若無可空白"></div>
-              <div class="fg"><div class="field-label">當期績效</div>
-                <select id="n-perf"><option value="">請選擇</option><option>傑出</option><option>優秀</option><option>良好</option></select>
-              </div>
-              <div class="fg"><div class="field-label">入職日</div><input type="text" id="n-joindate" placeholder="2010-05-01"></div>
-              <div class="fg"><div class="field-label">年資</div><input type="text" id="n-tenure" placeholder="14年3月"></div>
-              <div class="fg"><div class="field-label">異動類別</div>
-                <select id="n-movetype"><option value="">請選擇</option><option>真除代理</option><option>提報代理</option></select>
-              </div>
-              <div class="fg"><div class="field-label">審查方式</div>
-                <select id="n-reviewtype"><option value="">請選擇</option><option>一級</option><option>二級</option></select>
-              </div>
-            </div>
-            <div class="field-label" style="margin-bottom:0;">異動前 → 異動後</div>
-            <div class="promo-form">
-              <div style="display:grid;grid-template-columns:1fr 20px 1fr;gap:7px;margin-bottom:4px;">
-                <div class="pf-head">異動前</div><div></div><div class="pf-head after">異動後</div>
-              </div>
-              <div class="pf-grid"><input type="text" id="n-bg" placeholder="職等 例：8等"><div class="pf-arrow">→</div><input type="text" id="n-ag" placeholder="職等 例：9等"></div>
-              <div class="pf-grid"><input type="text" id="n-bt" placeholder="職稱 例：副理"><div class="pf-arrow">→</div><input type="text" id="n-at" placeholder="職稱 例：經理"></div>
-            </div>
-            <button class="btn btn-p" onclick="addCandidate()">新增審核案件</button>
-          </div>
-        </div>
-        <div class="settings-section">
-          <div class="ss-title">📋 現有審核案件</div>
-          <div id="admin-clist"><div class="empty-s">尚無案件</div></div>
-        </div>
-        <div class="settings-section">
-          <div class="ss-title">🔍 完整投票紀錄</div>
-          <div class="rec-scroll">
-            <table>
-              <thead><tr><th>#</th><th>委員</th><th>工號</th><th>案件</th><th>結果</th><th>不通過原因</th><th>時間</th></tr></thead>
-              <tbody id="rtbody"></tbody>
-            </table>
-            <div id="empty-r" class="empty-s" style="display:none;">📭 尚無投票紀錄</div>
-          </div>
-        </div>
-        <button class="btn-danger" onclick="resetAll()">⚠️ 清除所有票數與紀錄</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<nav class="bottom-nav" id="bottom-nav" style="display:none;">
-  <button class="nav-btn active" onclick="switchPage('vote',this)">
-    <div class="nav-indicator"></div>
-    <div class="nav-icon">🗳️</div>
-    <div class="nav-label">投票</div>
-  </button>
-  <button class="nav-btn" onclick="switchPage('results',this)">
-    <div class="nav-indicator"></div>
-    <div class="nav-icon">📊</div>
-    <div class="nav-label">結果</div>
-  </button>
-  <button class="nav-btn" onclick="switchPage('settings',this)">
-    <div class="nav-indicator"></div>
-    <div class="nav-icon">⚙️</div>
-    <div class="nav-label">設定</div>
-  </button>
-</nav>
-
-<div class="toast" id="toast"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body{font-family:sans-serif;background:#f5f6fa;margin:0}
+.container{padding:16px}
+.card{background:#fff;padding:12px;margin-bottom:10px;border-radius:10px}
+button{padding:10px;border:none;border-radius:6px;margin:5px;cursor:pointer}
+.pass{background:#22c55e;color:#fff}
+.fail{background:#ef4444;color:#fff}
+.abs{background:#f59e0b;color:#fff}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>投票系統</h2>
+
+<input id="name" placeholder="姓名">
+<input id="empId" placeholder="工號">
+<button onclick="login()">登入</button>
+
+<hr>
+
+<div id="vote-area"></div>
+
+<hr>
+
+<h3>📊 統計圖</h3>
+<canvas id="chart"></canvas>
+
+<hr>
+
+<h3>⚙️ 設定</h3>
+<input type="datetime-local" id="deadline">
+<button onclick="setDeadline()">設定截止</button>
+<button onclick="exportCSV()">匯出Excel</button>
+
+</div>
+
 <script>
-firebase.initializeApp({apiKey:"AIzaSyA2ZpeIZDLEpysnECE0WMvYoUkbrZ-SnK8",authDomain:"voting-system-6629b.firebaseapp.com",databaseURL:"https://voting-system-6629b-default-rtdb.firebaseio.com",projectId:"voting-system-6629b",storageBucket:"voting-system-6629b.firebasestorage.app",messagingSenderId:"769201801560",appId:"1:769201801560:web:f4144db3ad9310855cbd2d"});
+
+/* Firebase */
+firebase.initializeApp({
+  apiKey:"AIzaSyA2Z...",
+  databaseURL:"https://voting-system-6629b-default-rtdb.firebaseio.com"
+});
 const db = firebase.database();
-const ADMIN_PW = 'admin123';
-const FAIL_REASONS = [
-  {key:'professional',label:'職務專業能力不足'},{key:'motivate',label:'激勵部屬能力'},
-  {key:'develop',label:'培育部屬能力'},{key:'assist',label:'協助發展能力'},
-  {key:'perf_mgmt',label:'績效管理能力'},{key:'plan',label:'計劃與組織能力'},
-  {key:'work_mgmt',label:'工作管理能力'},{key:'followup',label:'進度跟催能力'},
-  {key:'communicate',label:'溝通協調能力'},{key:'problem',label:'問題解決能力'},
-];
-let S = { voter:null, candidates:{}, records:[], sel:{}, failSel:{}, myVotes:{}, myVoteKeys:{} };
-let adminOn = false;
 
-function doLogin() {
-  const name = document.getElementById('li-name').value.trim();
-  const empId = document.getElementById('li-empid').value.trim();
-  if (!name || !empId) { showToast('請填寫姓名與工號', true); return; }
-  S.voter = { name, empId }; S.sel = {}; S.failSel = {};
-  rebuildMyVotes();
-  Object.entries(S.myVotes).forEach(([cid, rec]) => {
-    S.sel[cid] = rec.result;
-    if (rec.result === 'fail' && rec.failReasons) { S.failSel[cid] = {}; rec.failReasons.forEach(k => { S.failSel[cid][k] = true; }); }
-  });
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('bottom-nav').style.display = 'flex';
-  document.getElementById('uav1').textContent = name.charAt(0);
-  document.getElementById('uname1').textContent = name;
-  document.getElementById('uid1').textContent = empId;
-  renderCandidates(); renderResults();
+/* 狀態 */
+let user = null;
+let candidates = {};
+let records = [];
+let deadline = null;
+let chart;
+
+/* 防重複投票 */
+function hasVoted(cid){
+  return localStorage.getItem("vote_"+cid) === "1";
+}
+function markVoted(cid){
+  localStorage.setItem("vote_"+cid,"1");
 }
 
-function doLogout() {
-  S.voter = null; S.sel = {}; S.failSel = {}; S.myVotes = {}; S.myVoteKeys = {};
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('bottom-nav').style.display = 'none';
-  document.getElementById('li-name').value = '';
-  document.getElementById('li-empid').value = '';
+/* 截止 */
+db.ref("settings/deadline").on("value",s=>{
+  deadline = s.val();
+});
+function isClosed(){
+  if(!deadline) return false;
+  return Date.now() > deadline;
 }
 
-function rebuildMyVotes() {
-  if (!S.voter) return; S.myVotes = {};
-  S.records.forEach(r => { if (r.empId === S.voter.empId) S.myVotes[r.candidateId] = r; });
+/* 登入 */
+function login(){
+  user={
+    name:document.getElementById("name").value,
+    empId:document.getElementById("empId").value
+  };
+  render();
 }
 
-db.ref('candidates').on('value', snap => {
-  S.candidates = snap.val() || {};
-  document.getElementById('connecting').style.display = 'none';
-  renderCandidates(); renderResults(); updateStats();
-  if (adminOn) renderAdminList();
+/* 載資料 */
+db.ref("candidates").on("value",s=>{
+  candidates = s.val()||{};
+  render();
+  drawChart();
+});
+db.ref("vote_records").on("value",s=>{
+  records = Object.values(s.val()||{});
+  drawChart();
 });
 
-db.ref('vote_records').on('value', snap => {
-  const data = snap.val() || {};
-  S.myVoteKeys = {}; S.records = [];
-  Object.entries(data).forEach(([key, val]) => {
-    S.records.push({ ...val, _key: key });
-    if (S.voter && val.empId === S.voter.empId) S.myVoteKeys[val.candidateId] = key;
+/* 投票 */
+async function vote(cid,type){
+  if(!user) return alert("請先登入");
+
+  if(hasVoted(cid)) return alert("此裝置已投過");
+
+  if(isClosed()) return alert("投票已截止");
+
+  let c = candidates[cid];
+  let field = type==="pass"?"passCount":
+              type==="fail"?"failCount":"absCount";
+
+  await db.ref("candidates/"+cid+"/"+field)
+    .transaction(v=>(v||0)+1);
+
+  await db.ref("vote_records").push({
+    name:user.name,
+    empId:user.empId,
+    candidateName:c.name,
+    result:type,
+    time:new Date().toLocaleString()
   });
-  S.records.sort((a,b) => b.timestamp - a.timestamp);
-  rebuildMyVotes();
-  if (S.voter) {
-    Object.entries(S.myVotes).forEach(([cid, rec]) => {
-      if (!S.sel[cid]) { S.sel[cid] = rec.result; if (rec.result === 'fail' && rec.failReasons) { S.failSel[cid] = {}; rec.failReasons.forEach(k => { S.failSel[cid][k] = true; }); } }
-    });
-  }
-  updateStats(); renderCandidates(); renderResults();
-  if (adminOn) renderRecords();
-});
 
-function selectVote(cid, val) {
-  S.sel[cid] = val;
-  ['pass','fail','abs'].forEach(t => { const el = document.getElementById('vb-'+cid+'-'+t); if (el) el.classList.toggle('sel', t === val); });
-  const fr = document.getElementById('fr-'+cid);
-  if (fr) fr.style.display = val === 'fail' ? 'block' : 'none';
+  markVoted(cid);
+  render();
 }
-function toggleFR(cid, key, checked) { if (!S.failSel[cid]) S.failSel[cid] = {}; S.failSel[cid][key] = checked; }
-function toggleFRClick(cid, key) { const cb = document.getElementById('fr-'+cid+'-'+key); if (cb) { cb.checked = !cb.checked; toggleFR(cid, key, cb.checked); } }
 
-async function submitVote(cid) {
-  if (!S.voter) { showToast('請先登入', true); return; }
-  const result = S.sel[cid];
-  if (!result) { showToast('請選擇通過、不通過或棄權', true); return; }
-  const c = S.candidates[cid]; if (!c) return;
-  const failReasons = result === 'fail' ? Object.entries(S.failSel[cid]||{}).filter(([,v])=>v).map(([k])=>k) : [];
-  const existing = S.myVotes[cid]; const isModify = !!existing;
-  try {
-    if (isModify) {
-      const oldField = existing.result==='pass'?'passCount':existing.result==='fail'?'failCount':'absCount';
-      await db.ref('candidates/'+cid+'/'+oldField).transaction(v => Math.max(0,(v||0)-1));
-      const oldKey = S.myVoteKeys[cid]; if (oldKey) await db.ref('vote_records/'+oldKey).remove();
+/* 畫面 */
+function render(){
+  let html="";
+  Object.entries(candidates).forEach(([id,c])=>{
+    html+=`
+    <div class="card">
+      <b>${c.name}</b><br>
+      通過:${c.passCount||0} 不通過:${c.failCount||0} 棄權:${c.absCount||0}<br>
+      ${isClosed()?"⛔已截止":""}<br>
+      <button class="pass" onclick="vote('${id}','pass')">通過</button>
+      <button class="fail" onclick="vote('${id}','fail')">不通過</button>
+      <button class="abs" onclick="vote('${id}','abs')">棄權</button>
+    </div>`;
+  });
+  document.getElementById("vote-area").innerHTML = html;
+}
+
+/* 圖表 */
+function drawChart(){
+  const labels=[],p=[],f=[],a=[];
+
+  Object.values(candidates).forEach(c=>{
+    labels.push(c.name);
+    p.push(c.passCount||0);
+    f.push(c.failCount||0);
+    a.push(c.absCount||0);
+  });
+
+  const ctx=document.getElementById("chart");
+
+  if(chart) chart.destroy();
+
+  chart=new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels,
+      datasets:[
+        {label:"通過",data:p},
+        {label:"不通過",data:f},
+        {label:"棄權",data:a}
+      ]
     }
-    const newField = result==='pass'?'passCount':result==='fail'?'failCount':'absCount';
-    await db.ref('candidates/'+cid+'/'+newField).transaction(v => (v||0)+1);
-    await db.ref('vote_records').push({ empId: S.voter.empId, name: S.voter.name, candidateId: cid, candidateName: c.name, result, failReasons, timestamp: Date.now(), time: new Date().toLocaleString('zh-TW') });
-    showToast(isModify ? '✅ 已修改投票結果' : '✅ 已完成「'+c.name+'」投票');
-  } catch(e) { showToast('提交失敗，請重試', true); }
+  });
 }
 
-function renderCandidates() {
-  const list = document.getElementById('cards-list');
-  const entries = Object.entries(S.candidates);
-  if (!entries.length) { list.innerHTML = '<div class="no-cases"><div style="font-size:44px;margin-bottom:12px">📋</div><p>尚無審核案件<br><span style="font-size:12px">請至設定頁新增</span></p></div>'; return; }
-  list.innerHTML = entries.map(([id],i) => buildCard(id,i+1)).join('');
+/* 匯出 */
+function exportCSV(){
+  let rows=[["姓名","工號","案件","結果","時間"]];
+  records.forEach(r=>{
+    rows.push([r.name,r.empId,r.candidateName,r.result,r.time]);
+  });
+  let csv=rows.map(r=>r.join(",")).join("\n");
+
+  let blob=new Blob([csv]);
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="投票.csv";
+  a.click();
 }
 
-function buildCard(id, idx) {
-  const c = S.candidates[id]; if (!c) return '';
-  const pC=c.passCount||0,fC=c.failCount||0,aC=c.absCount||0,total=pC+fC+aC;
-  const pPct=total>0?Math.round(pC/total*100):0,fPct=total>0?Math.round(fC/total*100):0,aPct=total>0?Math.round(aC/total*100):0;
-  const myVote=S.myVotes[id],hasVoted=!!myVote,curSel=S.sel[id]||'',noLogin=!S.voter;
-  let mvBadge='';
-  if(hasVoted){const rv=myVote.result;mvBadge=`<span class="my-vote-badge ${rv==='pass'?'mvb-pass':rv==='fail'?'mvb-fail':'mvb-abs'}">${rv==='pass'?'✓ 已投通過':rv==='fail'?'✗ 已投不通過':'△ 已投棄權'}</span>`;}
-  const cardCls=hasVoted?(myVote.result==='pass'?'voted-pass':myVote.result==='fail'?'voted-fail':'voted-abs'):'';
-  const frChecks=S.failSel[id]||{},dis=noLogin?'disabled':'';
-  const frHTML=`<div class="fail-reasons" id="fr-${id}" style="display:${curSel==='fail'?'block':'none'}"><div class="fr-title">不通過原因（可複選）</div><div class="fr-grid">${FAIL_REASONS.map(r=>`<div class="fr-item" onclick="toggleFRClick('${id}','${r.key}')"><input type="checkbox" id="fr-${id}-${r.key}" onchange="toggleFR('${id}','${r.key}',this.checked)" ${frChecks[r.key]?'checked':''} ${dis}><label for="fr-${id}-${r.key}">${r.label}</label></div>`).join('')}</div></div>`;
-  return `<div class="cc ${cardCls}" id="cc-${id}"><div class="cc-head"><div><div class="cc-case">CASE NO.${String(idx).padStart(2,'0')}</div><div class="cc-name">${c.name}</div><div class="cc-dept">${[c.div,c.dept,c.section].filter(Boolean).join(' › ')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="cc-empid">${c.empId||''}</div>${mvBadge}</div></div><div class="cc-body"><div class="info-pills"><div class="pill"><div class="pill-label">當期績效</div><div class="pill-val gold">${c.performance||'—'}</div></div><div class="pill"><div class="pill-label">入職日</div><div class="pill-val">${c.joinDate||'—'}</div></div><div class="pill"><div class="pill-label">年資</div><div class="pill-val">${c.tenure||'—'}</div></div>${c.reviewType?`<div class="pill"><div class="pill-label">審查</div><div class="pill-val red">${c.reviewType}審</div></div>`:''}</div><div class="promo-row"><span class="ptag ptag-b">${c.beforeGrade||'?'}</span><span class="ptag ptag-b">${c.beforeTitle||'?'}</span><span class="p-arrow">→</span><span class="ptag ptag-a">${c.afterGrade||'?'}</span><span class="ptag ptag-a">${c.afterTitle||'?'}</span>${c.moveType?`<span class="promo-type-tag">${c.moveType}</span>`:''}</div><div class="vote-section"><div class="vote-row-label">人評會意見${hasVoted?' · 可重新選擇修改':''}</div><div class="vote-btns"><button class="vbtn pass ${curSel==='pass'?'sel':''}" id="vb-${id}-pass" onclick="selectVote('${id}','pass')" ${dis}>✓ 通過</button><button class="vbtn fail ${curSel==='fail'?'sel':''}" id="vb-${id}-fail" onclick="selectVote('${id}','fail')" ${dis}>✗ 不通過</button><button class="vbtn abs ${curSel==='abs'?'sel':''}" id="vb-${id}-abs" onclick="selectVote('${id}','abs')" ${dis}>△ 棄權</button></div></div>${frHTML}<div class="res-wrap"><div class="res-top"><span class="res-lbl">即時統計（匿名）</span><span class="res-nums"><span class="rn-p">通過 ${pC}</span> · <span class="rn-f">不通過 ${fC}</span> · <span class="rn-a">棄權 ${aC}</span></span></div><div class="res-bar"><div class="rb-p" style="width:${pPct}%"></div><div class="rb-f" style="width:${fPct}%"></div><div class="rb-a" style="width:${aPct}%"></div></div></div>${!noLogin?`<button class="submit-btn" onclick="submitVote('${id}')">${hasVoted?'修改投票結果':'提交投票結果'}</button>`:''}</div></div>`;
+/* 設定截止 */
+function setDeadline(){
+  let val=document.getElementById("deadline").value;
+  db.ref("settings/deadline").set(new Date(val).getTime());
 }
 
-function renderResults() {
-  const list = document.getElementById('results-list');
-  const entries = Object.entries(S.candidates);
-  if (!entries.length) { list.innerHTML = '<div class="no-cases"><div style="font-size:44px;margin-bottom:12px">📊</div><p style="color:var(--txd)">尚無案件資料</p></div>'; return; }
-  list.innerHTML = entries.map(([id,c]) => {
-    const pC=c.passCount||0,fC=c.failCount||0,aC=c.absCount||0,total=pC+fC+aC;
-    const pPct=total>0?Math.round(pC/total*100):0,fPct=total>0?Math.round(fC/total*100):0,aPct=total>0?Math.round(aC/total*100):0;
-    let verdict='',vCls='';
-    if(total===0){verdict='尚無票數';vCls='vb-tie';}else if(pC>fC){verdict='✓ 通過';vCls='vb-pass';}else if(fC>pC){verdict='✗ 不通過';vCls='vb-fail';}else{verdict='— 同票';vCls='vb-tie';}
-    const cardCls=total===0?'':(pC>fC?'leading-pass':fC>pC?'leading-fail':'');
-    return `<div class="rc ${cardCls}"><div class="rc-accent-bar"></div><div class="rc-inner"><div class="rc-top"><div><div class="rc-name">${c.name}</div><div class="rc-dept">${[c.div,c.dept].filter(Boolean).join(' › ')}</div><div class="rc-promo">${c.beforeTitle||'?'} ${c.beforeGrade||''} → ${c.afterTitle||'?'} ${c.afterGrade||''}</div></div><span class="verdict-badge ${vCls}">${verdict}</span></div><div class="result-summary"><div class="rs-item rs-pass"><div class="rs-count">${pC}</div><div class="rs-label">通過</div></div><div class="rs-item rs-fail"><div class="rs-count">${fC}</div><div class="rs-label">不通過</div></div><div class="rs-item rs-abs"><div class="rs-count">${aC}</div><div class="rs-label">棄權</div></div></div><div class="rc-bar"><div class="rb-p" style="width:${pPct}%"></div><div class="rb-f" style="width:${fPct}%"></div><div class="rb-a" style="width:${aPct}%"></div></div></div></div>`;
-  }).join('');
-}
-
-function updateStats() {
-  document.getElementById('sv-total').textContent = S.records.length;
-  document.getElementById('sv-voters').textContent = new Set(S.records.map(r=>r.empId)).size;
-  document.getElementById('sv-cands').textContent = Object.keys(S.candidates).length;
-}
-
-function adminLogin() {
-  if (document.getElementById('admin-pw').value === ADMIN_PW) {
-    adminOn = true;
-    document.getElementById('admin-login-section').style.display = 'none';
-    document.getElementById('admin-dash').style.display = 'flex';
-    renderAdminList(); renderRecords();
-  } else showToast('密碼錯誤', true);
-}
-function adminLogout() {
-  adminOn = false;
-  document.getElementById('admin-login-section').style.display = 'block';
-  document.getElementById('admin-dash').style.display = 'none';
-  document.getElementById('admin-pw').value = '';
-}
-
-async function addCandidate() {
-  const empId=document.getElementById('n-empid').value.trim(),name=document.getElementById('n-name').value.trim();
-  if (!name||!empId) { showToast('請填寫工號與姓名',true); return; }
-  try {
-    await db.ref('candidates').push({empId,name,div:document.getElementById('n-div').value.trim(),dept:document.getElementById('n-dept').value.trim(),section:document.getElementById('n-sec').value.trim(),performance:document.getElementById('n-perf').value,joinDate:document.getElementById('n-joindate').value.trim(),tenure:document.getElementById('n-tenure').value.trim(),moveType:document.getElementById('n-movetype').value,reviewType:document.getElementById('n-reviewtype').value,beforeGrade:document.getElementById('n-bg').value.trim(),beforeTitle:document.getElementById('n-bt').value.trim(),afterGrade:document.getElementById('n-ag').value.trim(),afterTitle:document.getElementById('n-at').value.trim(),passCount:0,failCount:0,absCount:0});
-    ['n-empid','n-name','n-div','n-dept','n-sec','n-joindate','n-tenure','n-bg','n-bt','n-ag','n-at'].forEach(id=>document.getElementById(id).value='');
-    ['n-perf','n-movetype','n-reviewtype'].forEach(id=>document.getElementById(id).value='');
-    showToast('✅ 已新增：'+name);
-  } catch(e) { showToast('新增失敗',true); }
-}
-
-async function deleteCandidate(id,name) {
-  if (!confirm('確定要刪除「'+name+'」嗎？')) return;
-  try { await db.ref('candidates/'+id).remove(); showToast('已刪除：'+name); } catch(e) { showToast('刪除失敗',true); }
-}
-
-async function resetAll() {
-  if (!confirm('確定要清除所有票數與投票紀錄嗎？')) return;
-  try {
-    const u={};
-    Object.keys(S.candidates).forEach(id=>{u['candidates/'+id+'/passCount']=0;u['candidates/'+id+'/failCount']=0;u['candidates/'+id+'/absCount']=0;});
-    await db.ref().update(u); await db.ref('vote_records').remove();
-    showToast('✅ 已清除所有票數');
-  } catch(e) { showToast('清除失敗',true); }
-}
-
-function renderAdminList() {
-  const el=document.getElementById('admin-clist'),entries=Object.entries(S.candidates);
-  if (!entries.length) { el.innerHTML='<div class="empty-s">尚無案件</div>'; return; }
-  el.innerHTML=entries.map(([id,c])=>`<div class="acli"><div class="acli-info"><div class="acli-name">${c.name} <span style="font-family:Space Mono;font-size:10px;color:var(--txd);">${c.empId||''}</span></div><div class="acli-sub">${[c.div,c.dept,c.section].filter(Boolean).join(' › ')} ｜ ${c.beforeTitle||'?'}→${c.afterTitle||'?'}</div></div><div class="acli-votes"><div style="color:var(--ac3)">✓${c.passCount||0}</div><div style="color:var(--ac2)">✗${c.failCount||0}</div><div style="color:var(--gold)">△${c.absCount||0}</div></div><button class="btn btn-d" onclick="deleteCandidate('${id}','${c.name}')">刪除</button></div>`).join('');
-}
-
-function renderRecords() {
-  const tbody=document.getElementById('rtbody'),empty=document.getElementById('empty-r');
-  if (!S.records.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  tbody.innerHTML=S.records.map((r,i)=>{
-    const frText=(r.failReasons||[]).map(k=>FAIL_REASONS.find(f=>f.key===k)?.label||k).join('、')||'—';
-    const rCls=r.result==='pass'?'rtag-p':r.result==='fail'?'rtag-f':'rtag-a';
-    const rLbl=r.result==='pass'?'✓ 通過':r.result==='fail'?'✗ 不通過':'△ 棄權';
-    return`<tr><td style="color:var(--txd);font-size:10px;">${S.records.length-i}</td><td><strong>${r.name}</strong></td><td style="font-size:10px;color:var(--txd);">${r.empId}</td><td>${r.candidateName}</td><td><span class="rtag ${rCls}">${rLbl}</span></td><td style="font-size:10px;color:var(--txd);">${r.result==='fail'?frText:'—'}</td><td style="font-size:10px;color:var(--txd);">${r.time}</td></tr>`;
-  }).join('');
-}
-
-function switchPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  btn.classList.add('active');
-  window.scrollTo(0,0);
-}
-
-function showToast(msg, isError=false) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(isError?' error':'');
-  setTimeout(()=>t.classList.add('show'),10);
-  setTimeout(()=>t.classList.remove('show'),3200);
-}
 </script>
+
 </body>
 </html>

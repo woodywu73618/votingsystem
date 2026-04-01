@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="我的點點卡">
+<meta name="theme-color" content="#F472B6">
+<title>我的點點卡 🌸</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+:root{
+  --pink:#F472B6;--pink2:#EC4899;--pink-light:#FDF2F8;--pink-pale:#FFF5FB;--pink-mid:#FBCFE8;
+  --purple:#C084FC;--purple-light:#F5F0FF;--purple-mid:#E9D5FF;
+  --yellow:#FBBF24;--yellow-light:#FFFBEB;
+  --green:#34D399;--green-light:#ECFDF5;
+  --coral:#F87171;--coral-light:#FEF2F2;
+  --orange:#FB923C;--orange-light:#FFF7ED;
+  --navy:#831843;
+  --bg:#FFF0F8;--card:#fff;--text:#3D1A2E;--text2:#9D4B7A;--text3:#D4A0C0;
+  --shadow:0 4px 20px rgba(244,114,182,0.18);--shadow-sm:0 2px 12px rgba(244,114,182,0.13);
+  --r:18px;--r-sm:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom));position:relative;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle,rgba(244,114,182,0.18) 2px,transparent 2px),radial-gradient(circle,rgba(192,132,252,0.13) 2px,transparent 2px);
+  background-size:28px 28px,44px 44px;background-position:0 0,14px 14px;}
+.app{max-width:430px;margin:0 auto;position:relative;z-index:1;}
+
+.header{background:linear-gradient(135deg,#F472B6 0%,#C084FC 100%);padding:14px 20px 16px;padding-top:calc(14px + env(safe-area-inset-top));position:sticky;top:0;z-index:20;box-shadow:0 4px 20px rgba(244,114,182,0.35);}
+.header::after{content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,0.22) 2px,transparent 2px);background-size:22px 22px;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;position:relative;}
+.header h1{font-size:22px;font-weight:900;color:white;}
+.header-sub{font-size:12px;color:rgba(255,255,255,0.78);font-weight:700;position:relative;}
+.user-row{display:flex;align-items:center;gap:6px;position:relative;}
+.user-pill{background:rgba(255,255,255,0.24);border:1.5px solid rgba(255,255,255,0.4);border-radius:999px;padding:5px 14px 5px 10px;font-size:13px;color:white;font-weight:800;display:flex;align-items:center;gap:6px;}
+.user-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.6);}
+.logout-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.35);color:white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);margin-left:4px;display:none;}
+.sync-dot.show{display:inline-block;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:3px solid var(--pink-mid);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:20;box-shadow:0 -4px 18px rgba(244,114,182,0.15);}
+.bottom-nav::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,var(--pink) 0,var(--pink) 8px,var(--purple) 8px,var(--purple) 16px,transparent 16px,transparent 20px);}
+.nav-btn{flex:1;padding:10px 1px 7px;text-align:center;cursor:pointer;border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.nav-icon{font-size:20px;transition:transform 0.15s;}
+.nav-label{font-size:8px;color:var(--text3);font-weight:800;font-family:'Nunito',sans-serif;}
+.nav-btn.active .nav-label{color:var(--pink2);}
+.nav-btn.active .nav-icon{transform:scale(1.2);}
+.nav-badge-wrap{position:relative;display:inline-block;}
+.badge-dot{position:absolute;top:-1px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--coral);border:2px solid white;display:none;}
+.badge-dot.show{display:block;}
+
+.content{padding:14px 16px;}
+
+.child-tabs{display:flex;gap:10px;padding:14px 16px 6px;}
+.child-tab{flex:1;background:var(--card);border-radius:var(--r);border:3px solid transparent;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow-sm);}
+.child-tab.active{border-color:var(--pink);background:var(--pink-light);transform:translateY(-2px);box-shadow:0 6px 22px rgba(244,114,182,0.25);}
+.ct-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2.5px solid var(--pink-mid);display:block;margin:0 auto 6px;}
+.ct-emoji{font-size:34px;display:block;margin-bottom:5px;}
+.ct-name{font-size:16px;font-weight:900;color:var(--text);}
+.ct-pts{font-size:12px;font-weight:800;color:var(--pink2);background:var(--pink-light);display:inline-block;padding:2px 10px;border-radius:999px;margin-top:4px;}
+.child-tab.active .ct-pts{background:white;}
+
+.star-card{background:linear-gradient(135deg,#F472B6 0%,#C084FC 100%);border-radius:var(--r);padding:20px 20px 16px;text-align:center;margin-bottom:14px;box-shadow:0 8px 28px rgba(244,114,182,0.38);position:relative;overflow:hidden;}
+.star-card::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.2) 2.5px,transparent 2.5px);background-size:20px 20px;pointer-events:none;}
+.sc-deco1{position:absolute;font-size:80px;opacity:0.1;right:-8px;top:-8px;transform:rotate(15deg);pointer-events:none;}
+.sc-deco2{position:absolute;font-size:50px;opacity:0.12;left:6px;bottom:-6px;transform:rotate(-10deg);pointer-events:none;}
+.big-num{font-size:64px;font-weight:900;color:white;line-height:1;position:relative;}
+.big-label{font-size:13px;color:rgba(255,255,255,0.88);margin-top:2px;font-weight:700;position:relative;}
+.dots-row{display:flex;justify-content:center;gap:6px;margin-top:12px;flex-wrap:wrap;max-width:260px;margin-left:auto;margin-right:auto;position:relative;}
+.sdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.28);}
+.sdot.on{background:var(--yellow);}
+
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-title{font-size:16px;font-weight:900;color:var(--text);}
+.sec-hint{font-size:11px;color:var(--text3);font-weight:700;}
+.dot-divider{border:none;border-top:3px dotted var(--pink-mid);margin:14px 0;}
+
+.task-list{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
+.task-item{background:var(--card);border-radius:var(--r-sm);border:2.5px solid transparent;padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.18s;box-shadow:var(--shadow-sm);}
+.task-item:active{transform:scale(0.97);}
+.task-item.checked{border-color:var(--orange);background:var(--orange-light);}
+.task-item.approved{border-color:var(--green);background:var(--green-light);opacity:0.55;}
+.task-item.in-queue{border-color:var(--purple);background:var(--purple-light);opacity:0.7;cursor:default;}
+.task-item.in-queue .task-pts{background:var(--purple);}
+.task-item.view-only{cursor:default;}
+.task-emoji{font-size:24px;flex-shrink:0;}
+.task-name{flex:1;font-size:15px;font-weight:800;color:var(--text);}
+.task-pts{font-size:12px;font-weight:900;color:white;background:var(--pink);padding:3px 10px;border-radius:999px;flex-shrink:0;}
+.task-item.checked .task-pts{background:var(--orange);}
+.task-item.approved .task-pts{background:var(--green);}
+.check{width:25px;height:25px;border-radius:50%;border:2.5px solid var(--text3);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--pink-pale);transition:all 0.18s;}
+.check.on{background:var(--orange);border-color:var(--orange);}
+.check.done{background:var(--green);border-color:var(--green);}
+.check svg{display:none;}.check.on svg,.check.done svg{display:block;}
+.del-btn-sm{width:24px;height:24px;border-radius:50%;border:none;background:var(--coral-light);color:var(--coral);font-size:13px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;}
+
+.custom-task-card{background:var(--card);border-radius:var(--r);border:2.5px dashed var(--pink-mid);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.custom-task-title{font-size:15px;font-weight:900;color:var(--text);margin-bottom:6px;}
+.custom-task-sub{font-size:12px;color:var(--text3);font-weight:700;margin-bottom:12px;}
+.custom-input{width:100%;padding:11px 14px;border-radius:var(--r-sm);border:2px solid var(--pink-mid);background:var(--pink-pale);font-size:15px;font-weight:800;color:var(--text);font-family:'Nunito',sans-serif;outline:none;}
+.custom-input:focus{border-color:var(--pink);}
+.custom-pts-row{display:flex;gap:7px;margin:10px 0 12px;align-items:center;}
+.custom-pts-label{font-size:12px;font-weight:800;color:var(--text2);flex-shrink:0;}
+.pts-btn{min-width:36px;padding:0 8px;height:34px;border-radius:9px;border:2px solid var(--pink-mid);background:var(--pink-pale);font-size:13px;font-weight:900;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;transition:all 0.15s;}
+.pts-btn.active{border-color:var(--pink);background:var(--pink-light);color:var(--pink2);}
+.custom-submit-btn{width:100%;padding:12px;border-radius:var(--r-sm);border:none;background:linear-gradient(135deg,#F472B6,#C084FC);color:white;font-size:14px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.pending-custom-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.pending-custom-item{background:var(--orange-light);border:2px solid var(--orange);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.pci-name{flex:1;font-size:14px;font-weight:800;color:var(--text);}
+.pci-badge{font-size:11px;font-weight:800;background:var(--orange);color:white;padding:2px 8px;border-radius:999px;}
+
+.submit-btn{width:100%;padding:14px;border-radius:var(--r-sm);border:none;background:linear-gradient(135deg,#F472B6,#C084FC);color:white;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:12px;font-family:'Nunito',sans-serif;box-shadow:0 4px 16px rgba(244,114,182,0.38);transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:active{transform:scale(0.97);}
+.submit-btn:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+
+.add-form-card{background:var(--card);border-radius:var(--r);border:2.5px solid var(--pink-mid);padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+.add-form-title{font-size:15px;font-weight:900;color:var(--text);margin-bottom:14px;}
+.form-row{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.form-label{font-size:12px;font-weight:800;color:var(--text2);}
+.form-input{padding:11px 14px;border-radius:var(--r-sm);border:2px solid var(--pink-mid);background:var(--pink-pale);font-size:15px;font-weight:800;color:var(--text);font-family:'Nunito',sans-serif;outline:none;width:100%;}
+.form-input:focus{border-color:var(--pink);}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.ep-btn{width:42px;height:42px;border-radius:10px;border:2px solid var(--pink-mid);background:var(--pink-pale);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.ep-btn.active{border-color:var(--pink);background:var(--pink-light);}
+.form-actions{display:flex;gap:8px;margin-top:4px;}
+.form-save-btn{flex:1;padding:12px;border-radius:var(--r-sm);border:none;background:linear-gradient(135deg,#F472B6,#C084FC);color:white;font-size:14px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.form-cancel-btn{padding:12px 16px;border-radius:var(--r-sm);border:2px solid var(--text3);background:white;color:var(--text2);font-size:14px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.add-toggle-btn{width:100%;padding:13px;border:2.5px dashed var(--pink-mid);border-radius:var(--r-sm);background:rgba(244,114,182,0.06);font-size:14px;font-weight:800;color:var(--pink2);cursor:pointer;margin-bottom:12px;font-family:'Nunito',sans-serif;}
+
+.reward-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.reward-card{background:var(--card);border-radius:var(--r);border:2.5px solid transparent;padding:16px 12px 14px;text-align:center;cursor:pointer;transition:all 0.18s;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+.reward-card::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(244,114,182,0.06) 2px,transparent 2px);background-size:12px 12px;}
+.reward-card:active{transform:scale(0.96);}
+.reward-card.can{border-color:var(--pink);box-shadow:0 6px 20px rgba(244,114,182,0.22);}
+.reward-card.locked{opacity:0.38;cursor:not-allowed;}
+.reward-card.pending-redeem{border-color:var(--orange);background:var(--orange-light);}
+.reward-emoji{font-size:32px;margin-bottom:8px;display:block;}
+.reward-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.reward-cost{font-size:13px;font-weight:900;color:var(--navy);background:var(--yellow);display:inline-block;padding:3px 11px;border-radius:999px;}
+.del-r-btn{position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;border:none;background:var(--coral-light);color:var(--coral);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;z-index:2;}
+.edit-r-btn{position:absolute;top:7px;left:7px;width:22px;height:22px;border-radius:50%;border:none;background:var(--purple-light);color:var(--purple);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;z-index:2;}
+.reward-pending-badge{position:absolute;bottom:7px;right:7px;font-size:10px;font-weight:800;background:var(--orange);color:white;padding:2px 6px;border-radius:999px;z-index:2;}
+
+.pending-card{background:var(--card);border-radius:var(--r);border:2.5px solid var(--orange);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.pending-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.pending-who{font-size:15px;font-weight:900;color:var(--text);}
+.pending-time{font-size:11px;color:var(--text3);font-weight:700;margin-top:2px;}
+.pending-tasks{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.pt-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--orange-light);border-radius:var(--r-sm);}
+.pt-icon{font-size:18px;}
+.pt-name{flex:1;font-size:14px;font-weight:800;color:var(--text);}
+.pt-pts{font-size:12px;font-weight:900;color:var(--orange);background:white;padding:2px 8px;border-radius:999px;}
+.reward-pending-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--yellow-light);border-radius:var(--r-sm);}
+.custom-pending-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--purple-light);border-radius:var(--r-sm);}
+.p-actions{display:flex;gap:8px;}
+.approve-btn{flex:1;padding:12px;border-radius:var(--r-sm);border:none;background:var(--green);color:white;font-size:14px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.reject-btn{flex:1;padding:12px;border-radius:var(--r-sm);border:2px solid var(--coral);background:white;color:var(--coral);font-size:14px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+.deduct-btn{flex:1;padding:12px;border-radius:var(--r-sm);border:none;background:var(--coral);color:white;font-size:14px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+
+/* RECORDS */
+.records-list{display:flex;flex-direction:column;gap:10px;}
+.hist-item{background:var(--card);border-radius:var(--r-sm);border:2.5px solid transparent;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);}
+.hist-item.plus{border-color:rgba(52,211,153,0.35);}
+.hist-item.minus{border-color:rgba(248,113,113,0.28);}
+.hbadge{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hbadge.plus{background:var(--green-light);}
+.hbadge.minus{background:var(--coral-light);}
+.hinfo{flex:1;}
+.hname{font-size:14px;font-weight:800;color:var(--text);}
+.hwho{font-size:11px;color:var(--text3);margin-top:2px;font-weight:700;}
+.hval{font-size:18px;font-weight:900;}
+.hval.plus{color:var(--green);}
+.hval.minus{color:var(--coral);}
+/* Summary cards */
+.summary-row{display:flex;gap:10px;margin-bottom:14px;}
+.sum-card{flex:1;background:var(--card);border-radius:var(--r-sm);padding:12px;text-align:center;box-shadow:var(--shadow-sm);}
+.sum-num{font-size:26px;font-weight:900;}
+.sum-num.plus{color:var(--green);}
+.sum-num.minus{color:var(--coral);}
+.sum-num.total{color:var(--pink2);}
+.sum-label{font-size:11px;color:var(--text3);font-weight:700;margin-top:2px;}
+
+/* SETTINGS */
+.setting-card{background:var(--card);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1.5px solid var(--bg);}
+.setting-row:last-child{border-bottom:none;}
+.setting-lbl{font-size:15px;font-weight:800;color:var(--text);}
+.setting-sub{font-size:12px;color:var(--text3);margin-top:3px;font-weight:700;}
+.s-btn{padding:8px 16px;border-radius:999px;border:2px solid var(--pink-mid);background:var(--pink-light);font-size:13px;font-weight:800;color:var(--pink2);cursor:pointer;font-family:'Nunito',sans-serif;}
+.s-btn.danger{color:var(--coral);border-color:var(--coral-light);background:var(--coral-light);}
+.s-btn.orange{color:#9a5200;border-color:var(--orange-light);background:var(--orange-light);}
+.toggle{width:50px;height:28px;border-radius:14px;background:var(--text3);border:none;cursor:pointer;position:relative;transition:background 0.25s;flex-shrink:0;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:white;top:3px;left:3px;transition:left 0.25s;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.toggle.on::after{left:25px;}
+.stat-pill{font-size:19px;font-weight:900;color:var(--pink2);background:var(--pink-light);padding:5px 14px;border-radius:999px;}
+
+/* Avatar picker */
+.avatar-section{padding:14px 18px;border-top:1.5px solid var(--bg);}
+.avatar-preview{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--pink-mid);display:block;margin:0 auto 12px;}
+.avatar-emoji-preview{font-size:48px;display:block;text-align:center;margin-bottom:12px;}
+.big-emoji-picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.bep-btn{width:42px;height:42px;border-radius:10px;border:2px solid var(--pink-mid);background:var(--pink-pale);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.bep-btn.active{border-color:var(--pink);background:var(--pink-light);transform:scale(1.1);}
+.avatar-tab-row{display:flex;gap:8px;margin-bottom:12px;}
+.avatar-tab{flex:1;padding:8px;border-radius:var(--r-sm);border:2px solid var(--pink-mid);background:var(--pink-pale);text-align:center;font-size:13px;font-weight:800;color:var(--text2);cursor:pointer;}
+.avatar-tab.active{background:var(--pink-light);border-color:var(--pink);color:var(--pink2);}
+.upload-btn{width:100%;padding:12px;border-radius:var(--r-sm);border:2px dashed var(--pink-mid);background:var(--pink-pale);font-size:14px;font-weight:800;color:var(--pink2);cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:10px;}
+input[type=file]{display:none;}
+
+/* LOGIN */
+.overlay{display:none;position:fixed;inset:0;background:rgba(131,24,67,0.55);z-index:100;align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.pin-modal{background:var(--card);border-radius:26px 26px 0 0;padding:28px 24px calc(28px + env(safe-area-inset-bottom));width:100%;max-width:430px;text-align:center;position:relative;overflow:hidden;}
+.pin-modal::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(244,114,182,0.08) 2px,transparent 2px);background-size:18px 18px;}
+.pin-modal h2{font-size:22px;font-weight:900;margin-bottom:6px;color:var(--text);position:relative;}
+.pin-modal p{font-size:14px;color:var(--text2);margin-bottom:18px;font-weight:700;position:relative;}
+.user-select{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;position:relative;}
+.us-btn{flex:1;min-width:70px;padding:12px 6px;background:var(--pink-pale);border:2.5px solid var(--pink-mid);border-radius:var(--r-sm);cursor:pointer;text-align:center;transition:all 0.18s;}
+.us-btn.active{background:var(--pink-light);border-color:var(--pink);}
+.us-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--pink-mid);display:block;margin:0 auto 4px;}
+.us-emoji{font-size:26px;display:block;margin-bottom:4px;}
+.us-name{font-size:13px;font-weight:900;color:var(--text);}
+.pin-dots{display:flex;justify-content:center;gap:16px;margin-bottom:22px;position:relative;}
+.pdot{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--text3);background:white;transition:all 0.18s;}
+.pdot.on{background:var(--pink);border-color:var(--pink);transform:scale(1.15);}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;position:relative;}
+.num-btn{padding:16px;border-radius:var(--r-sm);border:2px solid var(--pink-mid);background:var(--pink-pale);font-size:24px;font-weight:900;color:var(--text);cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.12s;}
+.num-btn:active{background:var(--pink-light);transform:scale(0.93);}
+.num-btn.del{font-size:20px;color:var(--text2);}
+.pin-err{font-size:13px;color:var(--coral);margin-top:12px;min-height:18px;font-weight:800;position:relative;}
+.pin-cancel{margin-top:10px;background:none;border:none;font-size:15px;color:var(--text2);cursor:pointer;padding:8px 24px;font-family:'Nunito',sans-serif;font-weight:800;position:relative;}
+.pin-step2{display:none;}.pin-step2.show{display:block;}
+.cp-dots{display:flex;justify-content:center;gap:16px;margin-bottom:22px;}
+.cpdot{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--text3);background:white;transition:all 0.18s;}
+.cpdot.on{background:var(--pink);border-color:var(--pink);transform:scale(1.15);}
+
+/* LOADING */
+.loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;gap:14px;}
+.loading-screen h2{font-size:22px;font-weight:900;color:var(--pink2);}
+.loading-screen p{font-size:14px;color:var(--text3);font-weight:700;}
+.spin{width:40px;height:40px;border:4px solid var(--pink-mid);border-top-color:var(--pink);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.toast{position:fixed;bottom:calc(94px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(16px);background:var(--navy);color:white;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:800;white-space:nowrap;z-index:300;opacity:0;transition:all 0.25s;pointer-events:none;box-shadow:0 8px 22px rgba(131,24,67,0.32);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:36px 20px;color:var(--text3);font-size:16px;font-weight:800;}
+.empty-icon{font-size:44px;display:block;margin-bottom:10px;}
+.reset-req-card{background:var(--card);border-radius:var(--r);border:2.5px solid var(--orange);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div style="font-size:48px">🌸</div>
+  <div class="spin"></div>
+  <h2>我的點點卡</h2>
+  <p id="loadingMsg">連線中...</p>
+</div>
+
+<div class="app" id="app" style="display:none">
+  <div class="header">
+    <div class="header-top">
+      <div><h1>🌸 我的點點卡</h1><div class="header-sub">JN & JU</div></div>
+      <div class="user-row">
+        <div class="user-pill" id="userPill">👤</div>
+        <span class="sync-dot" id="syncDot"></span>
+        <button class="logout-btn" onclick="sfx();logout()">↩</button>
+      </div>
+    </div>
+  </div>
+  <div id="childTabsArea"></div>
+  <div class="content" id="mainContent"></div>
+</div>
+
+<div class="bottom-nav" id="bottomNav" style="display:none">
+  <button class="nav-btn active" id="bnav-tasks" onclick="sfx();switchTab('tasks')">
+    <span class="nav-icon">📋</span><span class="nav-label">任務</span>
+  </button>
+  <button class="nav-btn" id="bnav-rewards" onclick="sfx();switchTab('rewards')">
+    <span class="nav-icon">🎁</span><span class="nav-label">獎勵</span>
+  </button>
+  <button class="nav-btn" id="bnav-complaint" onclick="sfx();switchTab('complaint')">
+    <span class="nav-icon">📢</span><span class="nav-label">投訴</span>
+  </button>
+  <button class="nav-btn" id="bnav-pending" onclick="sfx();switchTab('pending')" style="display:none">
+    <span class="nav-badge-wrap">
+      <span class="nav-icon">🔔</span>
+      <span class="badge-dot" id="pendingBadge"></span>
+    </span>
+    <span class="nav-label">審核</span>
+  </button>
+  <button class="nav-btn" id="bnav-records" onclick="sfx();switchTab('records')">
+    <span class="nav-icon">📒</span><span class="nav-label">記錄</span>
+  </button>
+  <button class="nav-btn" id="bnav-settings" onclick="sfx();switchTab('settings')">
+    <span class="nav-icon">⚙️</span><span class="nav-label">設定</span>
+  </button>
+</div>
+
+<!-- LOGIN -->
+<div class="overlay" id="loginOverlay">
+  <div class="pin-modal">
+    <h2 id="loginTitle">🌸 選擇身份登入</h2>
+    <p id="loginDesc">請選擇你是誰</p>
+    <div class="user-select" id="userSelect">
+      <div class="us-btn" id="us-jn" onclick="sfx();selectLoginUser('jn')">
+        <span id="login-av-jn"></span><span id="login-name-jn" class="us-name" style="font-size:18px">JN</span>
+      </div>
+      <div class="us-btn" id="us-ju" onclick="sfx();selectLoginUser('ju')">
+        <span id="login-av-ju"></span><span id="login-name-ju" class="us-name" style="font-size:18px">JU</span>
+      </div>
+      <div class="us-btn" id="us-dad" onclick="sfx();selectLoginUser('dad')">
+        <span id="login-av-dad"></span><span id="login-name-dad" class="us-name" style="font-size:18px">爸爸</span>
+      </div>
+      <div class="us-btn" id="us-mom" onclick="sfx();selectLoginUser('mom')">
+        <span id="login-av-mom" style="width:36px;height:36px;border-radius:50%;background:#34D399;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:white;font-family:'Nunito',sans-serif;margin-bottom:4px">媽</span><span id="login-name-mom" class="us-name">媽媽</span>
+      </div>
+    </div>
+    <div class="pin-step2" id="pinStep2">
+      <div class="pin-dots">
+        <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
+        <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
+      </div>
+      <div class="numpad">
+        <button class="num-btn" onclick="sfx();pi('1')">1</button><button class="num-btn" onclick="sfx();pi('2')">2</button><button class="num-btn" onclick="sfx();pi('3')">3</button>
+        <button class="num-btn" onclick="sfx();pi('4')">4</button><button class="num-btn" onclick="sfx();pi('5')">5</button><button class="num-btn" onclick="sfx();pi('6')">6</button>
+        <button class="num-btn" onclick="sfx();pi('7')">7</button><button class="num-btn" onclick="sfx();pi('8')">8</button><button class="num-btn" onclick="sfx();pi('9')">9</button>
+        <button class="num-btn" style="visibility:hidden"></button>
+        <button class="num-btn" onclick="sfx();pi('0')">0</button>
+        <button class="num-btn del" onclick="sfx();pd()">⌫</button>
+      </div>
+      <div class="pin-err" id="pinErr"></div>
+      <button class="pin-cancel" onclick="sfx();backToSelect()">← 換人登入</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PIN -->
+<div class="overlay" id="changePinOverlay">
+  <div class="pin-modal">
+    <h2 id="cpTitle">🔑 修改密碼</h2>
+    <p id="cpDesc">請輸入新密碼</p>
+    <div class="cp-dots">
+      <div class="cpdot" id="cpd0"></div><div class="cpdot" id="cpd1"></div>
+      <div class="cpdot" id="cpd2"></div><div class="cpdot" id="cpd3"></div>
+    </div>
+    <div class="numpad">
+      <button class="num-btn" onclick="sfx();cpi('1')">1</button><button class="num-btn" onclick="sfx();cpi('2')">2</button><button class="num-btn" onclick="sfx();cpi('3')">3</button>
+      <button class="num-btn" onclick="sfx();cpi('4')">4</button><button class="num-btn" onclick="sfx();cpi('5')">5</button><button class="num-btn" onclick="sfx();cpi('6')">6</button>
+      <button class="num-btn" onclick="sfx();cpi('7')">7</button><button class="num-btn" onclick="sfx();cpi('8')">8</button><button class="num-btn" onclick="sfx();cpi('9')">9</button>
+      <button class="num-btn" style="visibility:hidden"></button>
+      <button class="num-btn" onclick="sfx();cpi('0')">0</button>
+      <button class="num-btn del" onclick="sfx();cpDel()">⌫</button>
+    </div>
+    <div class="pin-err" id="cpErr"></div>
+    <button class="pin-cancel" onclick="sfx();closeChangePin()">取消</button>
+  </div>
+</div>
+
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const GAS_URL='https://script.google.com/macros/s/AKfycbzDNbM9mNDu2MEiYon9iptGbHhFaCiPmKnB9s0eGAyMP_QwcIjII59OKpIVUkRJbLdr/exec';
+const DATA_KEY='dotcard_main';
+const LS_KEY='dotcard_local_v2';
+
+// ── SOUND ──
+const AC2=window.AudioContext||window.webkitAudioContext;let _ac;
+function sfx(t){try{if(!_ac)_ac=new AC2();const o=_ac.createOscillator(),g=_ac.createGain();o.connect(g);g.connect(_ac.destination);o.type='sine';
+  if(t==='success'){o.frequency.setValueAtTime(520,_ac.currentTime);o.frequency.setValueAtTime(680,_ac.currentTime+0.08);g.gain.setValueAtTime(0.16,_ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.28);o.start();o.stop(_ac.currentTime+0.28);}
+  else if(t==='error'){o.frequency.setValueAtTime(250,_ac.currentTime);g.gain.setValueAtTime(0.14,_ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.22);o.start();o.stop(_ac.currentTime+0.22);}
+  else{o.frequency.setValueAtTime(440,_ac.currentTime);o.frequency.setValueAtTime(560,_ac.currentTime+0.05);g.gain.setValueAtTime(0.10,_ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.14);o.start();o.stop(_ac.currentTime+0.14);}}catch(e){}}
+
+// ── CONSTANTS ──
+const TASK_E=['🐱','📚','🦷','🎹','📖','🧹','📌','🏃','🎨','🧩','🌿','🐕','🧼','🎯','🌟','🍳','🛁','🎸','⚽','🌸','🎀','💪','🎵','🌈'];
+const REWARD_E=['📺','🍪','🎮','🧸','🎯','🍦','🎪','🚀','🌈','💎','🏆','🎨','🍕','🎬','🛍️','🎡','💅','🎀','🍰','🎠'];
+const AVATAR_E=['👧','👧','🙋‍♀️','👩‍🎤','👸','🧚‍♀️','🧜‍♀️','🦄','🐱','🐰','🐻','🐼','🦊','🐸','🌸','⭐','🍓','🦋','🌙','🎀'];
+
+function dd(){return{
+  pins:{jn:'1111',ju:'2222',dad:'1234',mom:'5678'},
+  avatars:{jn:'',ju:'',dad:'',mom:''},
+  avatarPhotos:{jn:null,ju:null,dad:null,mom:null},
+  names:{jn:'JN',ju:'JU',dad:'爸爸',mom:'媽媽'},
+  autoReset:true,lastReset:new Date().toDateString(),
+  children:[{id:'jn',name:'JN',stars:0},{id:'ju',name:'JU',stars:0}],
+  tasks:[
+    {id:1,name:'照顧貓咪',icon:'🐱',pts:2},
+    {id:2,name:'完成功課',icon:'📚',pts:1},
+    {id:3,name:'刷牙洗臉',icon:'🦷',pts:1},
+    {id:4,name:'練習才藝',icon:'🎹',pts:1},
+    {id:5,name:'閱讀課外讀物',icon:'📖',pts:2},
+    {id:6,name:'做家事',icon:'🧹',pts:2},
+    {id:7,name:'不賴床',icon:'🌅',pts:1}
+  ],
+  taskState:{jn:{},ju:{}},
+  pending:[],customPending:[],rewardPending:[],complaintsPending:[],
+  rewards:[
+    {id:1,name:'看30分鐘電視',icon:'📺',cost:5},
+    {id:2,name:'買一個小零食',icon:'🍪',cost:8},
+    {id:3,name:'玩遊戲',icon:'🎮',cost:12},
+    {id:4,name:'選一個玩具',icon:'🧸',cost:25}
+  ],
+  records:{jn:[],ju:[]},
+  pinResetRequests:[]
+};}
+
+let D=null;
+let cu=null,tab='tasks',ac=0;
+let lu=null,lb='';
+let cpBuf='',cpStep='',cpFirst='',cpTarget='',cpCb=null;
+let showAddTask=false,showAddReward=false,editRid=null;
+let ntEmoji='📌',nrEmoji='🎀',ntPts=1,nrCost=5,ntName='',nrName='';
+let customTaskName='',customTaskPts=1;
+let editingAvatar=null,selAvatar='',avatarTabMode='emoji';
+let complaintText='';
+let syncTimer=null;
+let lastHash='';
+
+function nowS(){return new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false});}
+function todayS(){return new Date().toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});}
+function isPar(){return cu==='dad'||cu==='mom';}
+function parN(){return D&&D.names?D.names[cu]:(cu==='dad'?'爸爸':'媽媽');}
+function uName(id){
+  if(!D||!D.names)return id;
+  return D.names[id]||{jn:'JN',ju:'JU',dad:'爸爸',mom:'媽媽'}[id]||id;
+}
+function av(id){
+  if(D&&D.avatarPhotos&&D.avatarPhotos[id])return null;
+  return D&&D.avatars?D.avatars[id]||'👤':'👤';
+}
+function avHtml(id,size=32,cls=''){
+  const photo=D&&D.avatarPhotos&&D.avatarPhotos[id];
+  if(photo)return`<img src="${photo}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:2px solid var(--pink-mid)" class="${cls}">`;
+  const emoji=D&&D.avatars?D.avatars[id]:'';
+  const name=uName(id);
+  const initials=name.slice(0,2);
+  if(!emoji){
+    const colors={jn:'#F472B6',ju:'#C084FC',dad:'#60A5FA',mom:'#34D399'};
+    const bg=colors[id]||'#F472B6';
+    const fs=Math.round(size*0.42);
+    // use short label based on id
+    const label={jn:'JN',ju:'JU',dad:'爸',mom:'媽'}[id]||initials;
+    return`<span style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:900;color:white;flex-shrink:0;font-family:'Nunito',sans-serif" class="${cls}">${label}</span>`;
+  }
+  return`<span style="font-size:${size*0.8}px">${emoji}</span>`;
+}
+function lsLoad(){try{const s=localStorage.getItem(LS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
+function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+
+// ── GAS SYNC ──
+async function gasGet(){
+  try{
+    const r=await fetch(GAS_URL+'?key='+DATA_KEY,{method:'GET'});
+    const j=await r.json();
+    return j.value||null;
+  }catch(e){return null;}
+}
+async function gasSet(d){
+  try{
+    await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({key:DATA_KEY,value:d})});
+  }catch(e){}
+}
+
+function migrate(d){
+  if(!d)return dd();
+  if(!d.pins)d.pins={jn:'1111',ju:'2222',dad:'1234',mom:'5678'};
+  if(!d.avatars)d.avatars={jn:'👧',ju:'👧'};
+  if(!d.avatarPhotos)d.avatarPhotos={jn:null,ju:null,dad:null,mom:null};
+  if(!d.names)d.names={jn:'JN',ju:'JU',dad:'爸爸',mom:'媽媽'};
+  if(!d.avatars.dad)d.avatars.dad='👨';
+  if(!d.avatars.mom)d.avatars.mom='👩';
+  // sync children names from names store
+  if(d.children){d.children.forEach(ch=>{if(d.names[ch.id])ch.name=d.names[ch.id];});}
+  if(!d.taskState)d.taskState={jn:{},ju:{}};
+  if(!d.pending)d.pending=[];
+  if(!d.customPending)d.customPending=[];
+  if(!d.rewardPending)d.rewardPending=[];
+  if(!d.complaintsPending)d.complaintsPending=[];
+  if(!d.pinResetRequests)d.pinResetRequests=[];
+  if(!d.records||Array.isArray(d.records))d.records={jn:[],ju:[]};
+  return d;
+}
+
+async function sv(){
+  if(!D)return;
+  lsSave(D);
+  showSync(true);
+  await gasSet(D);
+  lastHash=JSON.stringify(D);
+  showSync(false);
+}
+
+function showSync(on){
+  const el=document.getElementById('syncDot');
+  if(el)el.classList.toggle('show',on);
+}
+
+async function init(){
+  document.getElementById('loadingMsg').textContent='載入資料中...';
+  // Try local first for speed
+  const local=lsLoad();
+  if(local&&local.children){
+    D=migrate(local);
+    showLoginScreen();
+  }
+  // Then fetch cloud
+  document.getElementById('loadingMsg').textContent='同步雲端資料...';
+  const cloud=await gasGet();
+  if(cloud&&cloud.children){
+    D=migrate(cloud);
+    lsSave(D);
+    syncLoginAvatars();
+    if(cu)render(); // refresh if already logged in
+  }
+  if(!D){D=dd();await gasSet(D);lsSave(D);}
+  document.getElementById('loadingScreen').style.display='none';
+  if(!cu)showLoginScreen();
+  startPoll();
+}
+
+function showLoginScreen(){
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('loginOverlay').classList.add('show');
+  syncLoginAvatars();
+}
+
+function startPoll(){
+  if(syncTimer)clearInterval(syncTimer);
+  syncTimer=setInterval(async()=>{
+    if(!cu)return;
+    const cloud=await gasGet();
+    if(!cloud||!cloud.children)return;
+    const h=JSON.stringify(cloud);
+    if(h===lastHash)return;
+    lastHash=h;
+    D=migrate(cloud);lsSave(D);render();
+    toast('🔄 已同步最新資料');
+  },10000);
+}
+
+function checkReset(){
+  if(!D||!D.autoReset)return;
+  const today=new Date().toDateString();
+  if(D.lastReset!==today){D.taskState={jn:{},ju:{}};D.lastReset=today;sv();if(cu)toast('✨ 新的一天！任務已重置');}
+}
+setInterval(()=>{const n=new Date();if(n.getHours()===0&&n.getMinutes()===0)checkReset();},30000);
+
+// ── LOGIN ──
+function syncLoginAvatars(){
+  ['jn','ju','dad','mom'].forEach(id=>{
+    const avEl=document.getElementById('login-av-'+id);
+    const nmEl=document.getElementById('login-name-'+id);
+    if(nmEl)nmEl.textContent=uName(id);
+    if(!avEl)return;
+    const photo=D&&D.avatarPhotos&&D.avatarPhotos[id];
+    const emoji=D&&D.avatars?D.avatars[id]:'';
+    if(photo){
+      // user has uploaded a photo — show it
+      avEl.outerHTML=`<img id="login-av-${id}" src="${photo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--pink-mid);display:block;margin:0 auto 6px">`;
+    } else if(emoji){
+      // user has chosen an emoji — show it
+      avEl.outerHTML=`<span id="login-av-${id}" style="font-size:28px;display:block;margin-bottom:4px">${emoji}</span>`;
+    } else {
+      // nothing set yet — show fixed initials circle
+      const colors={jn:'#F472B6',ju:'#C084FC',dad:'#60A5FA',mom:'#34D399'};
+      const label={jn:'JN',ju:'JU',dad:'爸',mom:'媽'}[id]||id.toUpperCase();
+      const bg=colors[id]||'#aaa';
+      avEl.outerHTML=`<span id="login-av-${id}" style="width:36px;height:36px;border-radius:50%;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:white;font-family:'Nunito',sans-serif;margin-bottom:4px">${label}</span>`;
+    }
+  });
+}
+function selectLoginUser(u){
+  lu=u;document.querySelectorAll('.us-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('us-'+u).classList.add('active');
+  document.getElementById('loginTitle').textContent=uName(u)+' 請輸入密碼';
+  document.getElementById('loginDesc').textContent='請輸入你的 4 位數密碼';
+  document.getElementById('pinStep2').classList.add('show');
+  document.getElementById('userSelect').style.display='none';
+  lb='';document.getElementById('pinErr').textContent='';updDots();
+}
+function backToSelect(){
+  lu=null;lb='';
+  document.getElementById('pinStep2').classList.remove('show');
+  document.getElementById('userSelect').style.display='flex';
+  document.getElementById('loginTitle').textContent='🌸 選擇身份登入';
+  document.getElementById('loginDesc').textContent='請選擇你是誰';
+  document.querySelectorAll('.us-btn').forEach(b=>b.classList.remove('active'));
+  updDots();
+}
+function pi(d){
+  if(!lu||lb.length>=4)return;lb+=d;updDots();document.getElementById('pinErr').textContent='';
+  if(lb.length===4){setTimeout(()=>{
+    if(lb===D.pins[lu]){
+      cu=lu;document.getElementById('loginOverlay').classList.remove('show');
+      document.getElementById('app').style.display='block';document.getElementById('bottomNav').style.display='flex';
+      sfx('success');initSess();
+    }else{sfx('error');document.getElementById('pinErr').textContent='❌ 密碼錯誤，請再試一次';lb='';updDots();}
+  },150);}
+}
+function pd(){if(lb.length>0){lb=lb.slice(0,-1);updDots();}}
+function updDots(){for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<lb.length);}
+function logout(){
+  cu=null;lu=null;lb='';showAddTask=false;showAddReward=false;editRid=null;editingAvatar=null;
+  document.getElementById('app').style.display='none';document.getElementById('bottomNav').style.display='none';
+  document.getElementById('loginOverlay').classList.add('show');syncLoginAvatars();backToSelect();
+}
+function initSess(){
+  checkReset();
+  updateUserPill();
+  document.getElementById('bnav-pending').style.display=isPar()?'flex':'none';
+  showAddTask=false;showAddReward=false;editRid=null;editingAvatar=null;
+  switchTab('tasks');
+}
+function updateUserPill(){
+  const pill=document.getElementById('userPill');if(!pill)return;
+  const photo=D.avatarPhotos&&D.avatarPhotos[cu];
+  const name=uName(cu);
+  if(photo){
+    pill.innerHTML=`<img class="user-avatar" src="${photo}"> ${name}`;
+  } else {
+    const emoji=D.avatars?D.avatars[cu]:'👤';
+    pill.textContent=emoji+' '+name;
+  }
+}
+
+// ── TABS ──
+function switchTab(t){
+  tab=t;showAddTask=false;showAddReward=false;editRid=null;editingAvatar=null;
+  ['tasks','rewards','complaint','pending','records','settings'].forEach(x=>{
+    const el=document.getElementById('bnav-'+x);if(el)el.classList.toggle('active',x===t);
+  });
+  render();
+}
+
+// ── RENDER ──
+function render(){
+  if(!D)return;
+  const area=document.getElementById('childTabsArea');
+  area.innerHTML=(isPar()&&['tasks','rewards','records'].includes(tab))?renderCTabs():'';
+  const c=document.getElementById('mainContent');
+  if(tab==='tasks')c.innerHTML=isPar()?rTasksP():rTasksC();
+  else if(tab==='rewards')c.innerHTML=rRewards();
+  else if(tab==='pending')c.innerHTML=rPending();
+  else if(tab==='records')c.innerHTML=rRecords();
+  else if(tab==='settings')c.innerHTML=rSettings();
+  else if(tab==='complaint')c.innerHTML=rComplaint();
+  const hp=(D.pending||[]).length+(D.customPending||[]).length+(D.rewardPending||[]).length+(D.pinResetRequests||[]).length+(D.complaintsPending||[]).length>0;
+  const bd=document.getElementById('pendingBadge');if(bd)bd.classList.toggle('show',hp&&isPar());
+}
+
+function renderCTabs(){
+  return`<div class="child-tabs">${D.children.map((ch,i)=>`
+    <div class="child-tab ${i===ac?'active':''}" onclick="sfx();ac=${i};render()">
+      ${avHtml(ch.id,44)}
+      <div class="ct-name">${uName(ch.id)}</div>
+      <div class="ct-pts">${ch.stars} 點</div>
+    </div>`).join('')}</div>`;
+}
+
+// ── TASKS child ──
+function rTasksC(){
+  const u=cu,ch=D.children.find(c=>c.id===u),st=D.taskState[u]||{};
+  const max=Math.max(10,Math.ceil(ch.stars/5)*5);
+  const dots=Array.from({length:Math.min(max,30)},(_,i)=>`<div class="sdot ${i<ch.stars?'on':''}"></div>`).join('');
+  const tasks=D.tasks.map(t=>{const s=st[t.id]||'none';
+    // also check if this task is in a pending submission
+    const inQueue=(D.pending||[]).some(p=>p.child===u&&p.tasks.some(x=>x.id===t.id));
+    const isPending=s==='pending'||inQueue;
+    const cls=s==='checked'?'checked':s==='approved'?'approved':isPending?'in-queue':'';
+    const onclick=isPending||s==='approved'?'':`onclick="sfx();togTask(${t.id})"`;
+    return`<div class="task-item ${cls}" ${onclick}>
+      <span class="task-emoji">${t.icon}</span><span class="task-name">${t.name}</span>
+      <span class="task-pts">${isPending?'審核中':s==='approved'?'✅ 完成':'+'+t.pts+'⭐'}</span>
+      <div class="check ${s==='checked'?'on':s==='approved'||isPending?'done':''}">
+        <svg width="13" height="13" viewBox="0 0 13 13"><polyline points="2,7 5.5,10.5 11,3" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div></div>`;}).join('');
+  const ck=Object.values(st).filter(v=>v==='checked').length;
+  const myCustom=(D.customPending||[]).filter(p=>p.child===u);
+  const myCustomHtml=myCustom.length?`<div class="sec-hint" style="margin-bottom:6px">審核中的自選任務</div>
+    <div class="pending-custom-list">${myCustom.map(p=>`<div class="pending-custom-item">
+      <span style="font-size:18px">📝</span><span class="pci-name">${p.name}</span>
+      <span class="pci-badge">+${p.pts}⭐ 審核中</span></div>`).join('')}</div>`:'';
+  return`<div class="star-card"><div class="sc-deco1">⭐</div><div class="sc-deco2">🌸</div>
+    <div class="big-num">${ch.stars}</div><div class="big-label">⭐ 累積點數</div>
+    <div class="dots-row">${dots}</div></div>
+    <div class="sec-header"><span class="sec-title">📋 今日任務</span><span class="sec-hint">${todayS()}</span></div>
+    <div class="task-list">${tasks}</div>
+    <button class="submit-btn" ${ck===0?'disabled':''} onclick="sfx('success');submitTaskReview()">📤 送交審核（${ck} 項）</button>
+    <hr class="dot-divider">
+    <div class="sec-header"><span class="sec-title">✏️ 其他任務</span><span class="sec-hint">不限次數申請</span></div>
+    ${renderCustomTaskForm()}${myCustomHtml}`;
+}
+function togTask(id){
+  const u=cu;if(!D.taskState[u])D.taskState[u]={};
+  const cur=D.taskState[u][id]||'none';
+  if(cur==='approved'){toast('已審核通過，無法取消 ✅');return;}
+  // 檢查此任務是否已在待審核佇列中
+  const alreadyPending=(D.pending||[]).some(p=>p.child===u&&p.tasks.some(t=>t.id===id));
+  if(alreadyPending){toast('這個任務已在審核中，請等家長確認 ⏳');return;}
+  D.taskState[u][id]=cur==='checked'?'none':'checked';sv();render();
+}
+async function submitTaskReview(){
+  const u=cu,st=D.taskState[u]||{};
+  const ids=Object.entries(st).filter(([k,v])=>v==='checked').map(([k])=>parseInt(k));
+  if(!ids.length)return;
+  // 過濾掉已在審核中的任務
+  const pendingIds=(D.pending||[]).filter(p=>p.child===u).flatMap(p=>p.tasks.map(t=>t.id));
+  const newIds=ids.filter(id=>!pendingIds.includes(id));
+  if(!newIds.length){toast('所有勾選的任務都已在審核中 ⏳');return;}
+  if(newIds.length<ids.length){toast('部分任務已在審核中，只送出未重複的部分');}
+  D.pending.push({id:Date.now(),child:u,tasks:D.tasks.filter(t=>newIds.includes(t.id)),time:nowS(),date:todayS()});
+  // 把已送出的任務改為 'pending' 狀態，防止重複勾選
+  newIds.forEach(id=>{D.taskState[u][id]='pending';});
+  await sv();toast('📤 已送交審核！');render();
+}
+function renderCustomTaskForm(){
+  const pp=[1,2,3,5].map(p=>`<button class="pts-btn ${p===customTaskPts?'active':''}" onclick="sfx();customTaskPts=${p};refreshCF()">+${p}</button>`).join('');
+  return`<div class="custom-task-card">
+    <div class="custom-task-title">📝 填寫自選任務</div>
+    <div class="custom-task-sub">完成任何沒有在上面的事，填寫後送審核給家長</div>
+    <input class="custom-input" id="customTaskInput" placeholder="我做了什麼？" maxlength="30" value="${customTaskName}">
+    <div class="custom-pts-row"><span class="custom-pts-label">申請幾點：</span>${pp}</div>
+    <button class="custom-submit-btn" onclick="sfx('success');submitCustomTask()">📤 送出申請</button>
+  </div>`;
+}
+function refreshCF(){customTaskName=document.getElementById('customTaskInput')?.value||'';render();
+  setTimeout(()=>{const el=document.getElementById('customTaskInput');if(el){el.focus();const l=el.value.length;el.setSelectionRange(l,l);}},10);}
+async function submitCustomTask(){
+  const name=document.getElementById('customTaskInput')?.value?.trim();
+  if(!name){toast('請填寫任務內容');sfx('error');return;}
+  D.customPending.push({id:Date.now(),child:cu,name,pts:customTaskPts,time:nowS(),date:todayS()});
+  customTaskName='';customTaskPts=1;await sv();toast('📤 已送出申請！');render();
+}
+
+// ── TASKS parent ──
+function rTasksP(){
+  const ch=D.children[ac],u=ch.id,st=D.taskState[u]||{};
+  const max=Math.max(10,Math.ceil(ch.stars/5)*5);
+  const dots=Array.from({length:Math.min(max,30)},(_,i)=>`<div class="sdot ${i<ch.stars?'on':''}"></div>`).join('');
+  const tasks=D.tasks.map(t=>{const s=st[t.id]||'none';
+    return`<div class="task-item view-only ${s==='checked'?'checked':s==='approved'?'approved':''}">
+      <span class="task-emoji">${t.icon}</span><span class="task-name">${t.name}</span>
+      <span class="task-pts">+${t.pts}⭐</span>
+      <button class="del-btn-sm" onclick="event.stopPropagation();sfx();delTask(${t.id})">✕</button>
+    </div>`;}).join('');
+  const addH=showAddTask?renderAddTaskForm():`<button class="add-toggle-btn" onclick="sfx();showAddTask=true;render()">＋ 新增任務</button>`;
+  return`<div class="star-card"><div class="sc-deco1">⭐</div><div class="sc-deco2">🌸</div>
+    <div class="big-num">${ch.stars}</div><div class="big-label">⭐ ${uName(ch.id)} 的累積點數</div>
+    <div class="dots-row">${dots}</div></div>
+    <div class="sec-header"><span class="sec-title">📋 今日任務狀況</span><span class="sec-hint">${todayS()}</span></div>
+    <div class="task-list">${tasks}</div>${addH}`;
+}
+function renderAddTaskForm(){
+  const ep=TASK_E.map(e=>`<button class="ep-btn ${e===ntEmoji?'active':''}" onclick="sfx();ntEmoji='${e}';rip()">${e}</button>`).join('');
+  const pp=[1,2,3,5].map(p=>`<button class="pts-btn ${p===ntPts?'active':''}" onclick="sfx();ntPts=${p};rip()">+${p}</button>`).join('');
+  return`<div class="add-form-card">
+    <div class="add-form-title">➕ 新增任務</div>
+    <div class="form-row"><div class="form-label">任務名稱</div>
+      <input class="form-input" id="ntInput" placeholder="例如：練習游泳" maxlength="20" value="${ntName}"></div>
+    <div class="form-row"><div class="form-label">選擇圖示</div><div class="emoji-picker">${ep}</div></div>
+    <div class="form-row"><div class="form-label">給幾點</div><div class="pts-row">${pp}</div></div>
+    <div class="form-actions">
+      <button class="form-cancel-btn" onclick="sfx();showAddTask=false;ntName='';render()">取消</button>
+      <button class="form-save-btn" onclick="sfx('success');saveNewTask()">✅ 儲存</button>
+    </div></div>`;
+}
+function rip(){ntName=document.getElementById('ntInput')?.value||'';nrName=document.getElementById('nrInput')?.value||'';render();
+  setTimeout(()=>{const el=document.getElementById(showAddTask?'ntInput':'nrInput');if(el){el.focus();const l=el.value.length;el.setSelectionRange(l,l);}},10);}
+async function saveNewTask(){
+  const name=document.getElementById('ntInput')?.value?.trim();if(!name){toast('請輸入任務名稱');return;}
+  D.tasks.push({id:Date.now(),name,icon:ntEmoji,pts:ntPts});showAddTask=false;ntName='';await sv();toast('✅ 任務已新增！');render();
+}
+async function delTask(id){
+  if(!confirm('確定要刪除這個任務嗎？'))return;
+  D.tasks=D.tasks.filter(t=>t.id!==id);await sv();toast('任務已刪除');render();
+}
+
+// ── REWARDS ──
+function rRewards(){
+  const par=isPar(),ch=par?D.children[ac]:D.children.find(c=>c.id===cu);
+  const cid=par?ch.id:cu;
+  const prids=(D.rewardPending||[]).filter(r=>r.child===cid).map(r=>r.rewardId);
+  const cards=D.rewards.map(r=>{
+    const lk=ch.stars<r.cost,ip=prids.includes(r.id);
+    const del=par?`<button class="del-r-btn" onclick="event.stopPropagation();sfx();delReward(${r.id})">✕</button>`:'';
+    const edit=par?`<button class="edit-r-btn" onclick="event.stopPropagation();sfx();startEditReward(${r.id})">✎</button>`:'';
+    const pb=ip?`<span class="reward-pending-badge">審核中</span>`:'';
+    let cls=lk?'locked':ip?'pending-redeem':'can';
+    let click=par?`redeemP(${r.id})`:(ip?`toast('等待家長審核中...')`:(lk?`toast('點數不足 💫')`:`subRedeem(${r.id})`));
+    return`<div class="reward-card ${cls}" onclick="sfx();${click}">
+      ${del}${edit}${pb}
+      <span class="reward-emoji">${r.icon}</span>
+      <div class="reward-name">${r.name}</div>
+      <div class="reward-cost">⭐ ${r.cost} 點</div>
+    </div>`;}).join('');
+  let addH='';
+  if(par){if(editRid)addH=renderEditRewardForm();
+    else if(showAddReward)addH=renderAddRewardForm();
+    else addH=`<button class="add-toggle-btn" onclick="sfx();showAddReward=true;nrName='';render()">＋ 新增獎勵</button>`;}
+  return`<div class="sec-header" style="margin-bottom:12px"><span class="sec-title">🎁 可兌換獎勵</span></div>
+    <div class="reward-grid">${cards}</div>${addH}`;
+}
+async function subRedeem(rid){
+  const u=cu,ch=D.children.find(c=>c.id===u),r=D.rewards.find(x=>x.id===rid);
+  if(!r||ch.stars<r.cost)return;
+  if((D.rewardPending||[]).some(p=>p.child===u&&p.rewardId===rid)){toast('已送出申請，等待審核');return;}
+  D.rewardPending.push({id:Date.now(),child:u,rewardId:rid,rewardName:r.name,rewardIcon:r.icon,cost:r.cost,time:nowS(),date:todayS()});
+  await sv();sfx('success');toast('📤 已送出兌換申請！');render();
+}
+async function redeemP(rid){
+  const ch=D.children[ac],r=D.rewards.find(x=>x.id===rid);
+  if(!r||ch.stars<r.cost)return;if(!confirm(`確定幫 ${ch.name} 用 ${r.cost} 點換「${r.name}」嗎？`))return;
+  ch.stars-=r.cost;D.records[ch.id].unshift({text:'兌換：'+r.name,val:r.cost,plus:false,who:parN(),time:todayS()+' '+nowS()});
+  sfx('success');toast(`🎉 ${uName(ch.id)} 兌換「${r.name}」！`);await sv();render();
+}
+function renderAddRewardForm(){
+  const ep=REWARD_E.map(e=>`<button class="ep-btn ${e===nrEmoji?'active':''}" onclick="sfx();nrEmoji='${e}';rip()">${e}</button>`).join('');
+  return`<div class="add-form-card">
+    <div class="add-form-title">🎁 新增獎勵</div>
+    <div class="form-row"><div class="form-label">獎勵名稱</div>
+      <input class="form-input" id="nrInput" placeholder="例如：看一部電影" maxlength="20" value="${nrName}"></div>
+    <div class="form-row"><div class="form-label">選擇圖示</div><div class="emoji-picker">${ep}</div></div>
+    <div class="form-row"><div class="form-label">需要幾點</div>
+      <input class="form-input" id="nrCostInput" type="number" min="1" max="9999" placeholder="例如：50" value="${nrCost}" style="width:130px"></div>
+    <div class="form-actions">
+      <button class="form-cancel-btn" onclick="sfx();showAddReward=false;nrName='';render()">取消</button>
+      <button class="form-save-btn" onclick="sfx('success');saveNewReward()">✅ 儲存</button>
+    </div></div>`;
+}
+function renderEditRewardForm(){
+  const r=D.rewards.find(x=>x.id===editRid);if(!r)return'';
+  const ep=REWARD_E.map(e=>`<button class="ep-btn ${e===nrEmoji?'active':''}" onclick="sfx();nrEmoji='${e}';rip()">${e}</button>`).join('');
+  return`<div class="add-form-card" style="border-color:var(--purple)">
+    <div class="add-form-title">✏️ 修改獎勵</div>
+    <div class="form-row"><div class="form-label">獎勵名稱</div>
+      <input class="form-input" id="nrInput" maxlength="20" value="${nrName||r.name}"></div>
+    <div class="form-row"><div class="form-label">選擇圖示</div><div class="emoji-picker">${ep}</div></div>
+    <div class="form-row"><div class="form-label">需要幾點</div>
+      <input class="form-input" id="nrCostInput" type="number" min="1" max="9999" value="${nrCost}" style="width:130px"></div>
+    <div class="form-actions">
+      <button class="form-cancel-btn" onclick="sfx();editRid=null;render()">取消</button>
+      <button class="form-save-btn" onclick="sfx('success');saveEditReward()">✅ 更新</button>
+    </div></div>`;
+}
+async function saveNewReward(){
+  const name=document.getElementById('nrInput')?.value?.trim();if(!name){toast('請輸入獎勵名稱');return;}
+  const cost=Math.max(1,parseInt(document.getElementById('nrCostInput')?.value)||1);
+  D.rewards.push({id:Date.now(),name,icon:nrEmoji,cost});showAddReward=false;nrName='';await sv();toast('🎁 獎勵已新增！');render();
+}
+async function delReward(id){if(!confirm('確定要刪除？'))return;D.rewards=D.rewards.filter(r=>r.id!==id);await sv();toast('獎勵已刪除');render();}
+function startEditReward(id){const r=D.rewards.find(x=>x.id===id);if(!r)return;editRid=id;nrEmoji=r.icon;nrCost=r.cost;nrName=r.name;showAddReward=false;render();}
+async function saveEditReward(){
+  const name=document.getElementById('nrInput')?.value?.trim();if(!name){toast('請輸入獎勵名稱');return;}
+  const cost=Math.max(1,parseInt(document.getElementById('nrCostInput')?.value)||1);
+  const r=D.rewards.find(x=>x.id===editRid);if(!r)return;
+  r.name=name;r.icon=nrEmoji;r.cost=cost;editRid=null;await sv();toast('✅ 獎勵已更新！');render();
+}
+
+// ── PENDING ──
+function rPending(){
+  const rs=D.pinResetRequests||[];let html='';
+  if(rs.length){
+    html+=`<div class="sec-header" style="margin-bottom:10px"><span class="sec-title">🔑 密碼重設申請</span></div>`;
+    html+=rs.map(r=>{const ch=D.children.find(c=>c.id===r.child);
+      return`<div class="reset-req-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:26px">${av(r.child)||'👤'}</span>
+          <div><div style="font-size:15px;font-weight:900">${uName(r.child)} 申請重設密碼</div>
+          <div style="font-size:11px;color:var(--text3);font-weight:700">${r.time}</div>
+          <div style="font-size:12px;color:var(--text2);font-weight:800;margin-top:3px">新密碼：${'●'.repeat((r.newPin||'').length)} （批准後立即生效）</div></div>
+        </div>
+        <div class="p-actions">
+          <button class="approve-btn" onclick="sfx('success');apvReset('${r.id}')">✅ 批准</button>
+          <button class="reject-btn" onclick="sfx();rejReset('${r.id}')">❌ 拒絕</button>
+        </div></div>`;}).join('');
+  }
+  if((D.complaintsPending||[]).length){
+    html+=`<div class="sec-header" style="margin-bottom:10px;margin-top:${rs.length?'14px':'0'}"><span class="sec-title">📢 投訴內容</span></div>`;
+    html+=(D.complaintsPending||[]).map(p=>{
+      const ch=D.children.find(c=>c.id===p.from);
+      return`<div class="pending-card" style="border-color:var(--purple)">
+        <div class="pending-header">
+          <span style="font-size:26px">${avHtml(p.from,32)}</span>
+          <div><div class="pending-who">${ch?ch.name:p.from} 說的話</div>
+          <div class="pending-time">${p.date} ${p.time}</div></div>
+        </div>
+        <div class="pending-tasks">
+          <div class="custom-pending-row" style="background:var(--purple-light)">
+            <span class="pt-icon">📢</span>
+            <span class="pt-name" style="white-space:pre-wrap;word-break:break-all">${p.content}</span>
+          </div>
+        </div>
+        <div style="font-size:13px;font-weight:800;color:var(--text2);margin-bottom:8px">要扣誰的點數？</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          ${D.children.map(c=>`<button class="deduct-btn" style="flex:1" onclick="sfx();deductComplaint('${p.id}','${c.id}')">${avHtml(c.id,20)} ${c.name} 扣點</button>`).join('')}
+        </div>
+        <button class="approve-btn" style="width:100%" onclick="sfx();dismissComplaint('${p.id}')">✅ 知道了，不扣點</button>
+      </div>`;}).join('');
+  }
+  if((D.rewardPending||[]).length){
+    html+=`<div class="sec-header" style="margin-bottom:10px;margin-top:14px"><span class="sec-title">🎁 獎勵兌換申請</span></div>`;
+    html+=(D.rewardPending||[]).map(p=>{const ch=D.children.find(c=>c.id===p.child);
+      return`<div class="pending-card">
+        <div class="pending-header"><span style="font-size:26px">${avHtml(p.child,32)}</span>
+          <div><div class="pending-who">${uName(p.child)} 申請兌換</div>
+          <div class="pending-time">${p.date} ${p.time}・需 ${p.cost} 點</div></div></div>
+        <div class="pending-tasks"><div class="reward-pending-row">
+          <span class="pt-icon">${p.rewardIcon}</span><span class="pt-name">${p.rewardName}</span>
+          <span class="pt-pts" style="color:var(--pink2);background:var(--pink-light)">-${p.cost}⭐</span>
+        </div></div>
+        <div class="p-actions">
+          <button class="approve-btn" onclick="sfx('success');apvRedeem('${p.id}')">✅ 通過</button>
+          <button class="reject-btn" onclick="sfx();rejRedeem('${p.id}')">❌ 拒絕</button>
+        </div></div>`;}).join('');
+  }
+  if((D.customPending||[]).length){
+    html+=`<div class="sec-header" style="margin-bottom:10px;margin-top:14px"><span class="sec-title">✏️ 自選任務申請</span></div>`;
+    html+=(D.customPending||[]).map(p=>{const ch=D.children.find(c=>c.id===p.child);
+      return`<div class="pending-card">
+        <div class="pending-header"><span style="font-size:26px">${avHtml(p.child,32)}</span>
+          <div><div class="pending-who">${uName(p.child)} 的自選任務</div>
+          <div class="pending-time">${p.date} ${p.time}・申請 +${p.pts} 點</div></div></div>
+        <div class="pending-tasks"><div class="custom-pending-row">
+          <span class="pt-icon">📝</span><span class="pt-name">${p.name}</span>
+          <span class="pt-pts" style="color:var(--purple);background:var(--purple-light)">+${p.pts}⭐</span>
+        </div></div>
+        <div class="p-actions">
+          <button class="approve-btn" onclick="sfx('success');apvCustom('${p.id}')">✅ 通過</button>
+          <button class="reject-btn" onclick="sfx();rejCustom('${p.id}')">❌ 拒絕</button>
+        </div></div>`;}).join('');
+  }
+  if((D.pending||[]).length){
+    html+=`<div class="sec-header" style="margin-bottom:10px;margin-top:14px"><span class="sec-title">🔔 任務審核申請</span></div>`;
+    html+=(D.pending||[]).map(p=>{const ch=D.children.find(c=>c.id===p.child);const tot=p.tasks.reduce((s,t)=>s+t.pts,0);
+      return`<div class="pending-card">
+        <div class="pending-header"><span style="font-size:26px">${avHtml(p.child,32)}</span>
+          <div><div class="pending-who">${uName(p.child)} 的任務申請</div>
+          <div class="pending-time">${p.date} ${p.time}・共 ${tot} 點</div></div></div>
+        <div class="pending-tasks">${p.tasks.map(t=>`<div class="pt-row">
+          <span class="pt-icon">${t.icon}</span><span class="pt-name">${t.name}</span>
+          <span class="pt-pts">+${t.pts}⭐</span></div>`).join('')}</div>
+        <div class="p-actions">
+          <button class="approve-btn" onclick="sfx('success');apvTask('${p.id}')">✅ 通過</button>
+          <button class="reject-btn" onclick="sfx();rejTask('${p.id}')">❌ 拒絕</button>
+        </div></div>`;}).join('');
+  }
+  return html||`<div class="empty"><span class="empty-icon">🎉</span>目前沒有待審核項目</div>`;
+}
+
+async function apvTask(id){
+  const idx=(D.pending||[]).findIndex(p=>p.id==id);if(idx<0)return;
+  const p=D.pending[idx],ch=D.children.find(c=>c.id===p.child),tot=p.tasks.reduce((s,t)=>s+t.pts,0);
+  ch.stars+=tot;if(!D.taskState[p.child])D.taskState[p.child]={};
+  p.tasks.forEach(t=>{D.taskState[p.child][t.id]='approved';});
+  D.records[p.child].unshift({text:p.tasks.map(t=>t.name).join('、'),val:tot,plus:true,who:parN()+'審核',time:p.date+' '+p.time});
+  D.pending.splice(idx,1);await sv();toast(`✅ ${uName(p.child)} 獲得 ${tot} 點`);render();
+}
+async function rejTask(id){
+  const idx=(D.pending||[]).findIndex(p=>p.id==id);if(idx<0)return;
+  const p=D.pending[idx];if(!D.taskState[p.child])D.taskState[p.child]={};
+  // reset both 'checked' and 'pending' states back to 'none' so child can re-submit
+  p.tasks.forEach(t=>{
+    const s=D.taskState[p.child][t.id];
+    if(s==='checked'||s==='pending')D.taskState[p.child][t.id]='none';
+  });
+  D.pending.splice(idx,1);await sv();toast('❌ 已拒絕，任務已重置可重新送出');render();
+}
+async function apvCustom(id){
+  const idx=(D.customPending||[]).findIndex(p=>p.id==id);if(idx<0)return;
+  const p=D.customPending[idx],ch=D.children.find(c=>c.id===p.child);
+  ch.stars+=p.pts;D.records[p.child].unshift({text:'自選：'+p.name,val:p.pts,plus:true,who:parN()+'審核',time:p.date+' '+p.time});
+  D.customPending.splice(idx,1);await sv();toast(`✅ ${uName(p.child)} 獲得 ${p.pts} 點`);render();
+}
+async function rejCustom(id){
+  const idx=(D.customPending||[]).findIndex(p=>p.id==id);if(idx<0)return;
+  D.customPending.splice(idx,1);await sv();toast('❌ 已拒絕');render();
+}
+async function apvRedeem(id){
+  const idx=(D.rewardPending||[]).findIndex(p=>p.id==id);if(idx<0)return;
+  const p=D.rewardPending[idx],ch=D.children.find(c=>c.id===p.child);
+  if(ch.stars<p.cost){toast(`❌ ${ch.name} 點數不足`);return;}
+  ch.stars-=p.cost;D.records[p.child].unshift({text:'兌換：'+p.rewardName,val:p.cost,plus:false,who:parN()+'審核',time:p.date+' '+p.time});
+  D.rewardPending.splice(idx,1);await sv();toast(`🎉 ${uName(p.child)} 兌換成功！`);render();
+}
+async function rejRedeem(id){
+  const idx=(D.rewardPending||[]).findIndex(p=>p.id==id);if(idx<0)return;
+  D.rewardPending.splice(idx,1);await sv();toast('❌ 已拒絕兌換申請');render();
+}
+async function apvReset(id){
+  const idx=(D.pinResetRequests||[]).findIndex(r=>r.id==id);if(idx<0)return;
+  const r=D.pinResetRequests[idx];
+  // newPin was already set by child during request — just apply it
+  D.pins[r.child]=r.newPin;
+  D.pinResetRequests.splice(idx,1);
+  await sv();sfx('success');toast('✅ 密碼已重設');render();
+}
+async function rejReset(id){
+  D.pinResetRequests=(D.pinResetRequests||[]).filter(r=>r.id!=id);await sv();toast('已拒絕');render();
+}
+async function deductComplaint(pid,targetId){
+  const p=(D.complaintsPending||[]).find(x=>x.id==pid);if(!p)return;
+  const pts=parseInt(prompt(`扣 ${D.children.find(c=>c.id===targetId)?.name} 幾點？`,'1'))||0;
+  if(pts<=0){toast('請輸入大於0的點數');return;}
+  const ch=D.children.find(c=>c.id===targetId);
+  ch.stars=Math.max(0,ch.stars-pts);
+  D.records[targetId].unshift({text:'扣點（投訴）',val:pts,plus:false,who:parN()+'決定',time:p.date+' '+p.time});
+  D.complaintsPending=D.complaintsPending.filter(x=>x.id!=pid);
+  await sv();toast(`已扣 ${uName(targetId)} ${pts} 點`);render();
+}
+async function dismissComplaint(pid){
+  D.complaintsPending=(D.complaintsPending||[]).filter(x=>x.id!=pid);await sv();render();
+}
+
+// ── COMPLAINT ──
+function rComplaint(){
+  const myComplaints=(D.complaintsPending||[]).filter(p=>p.from===cu);
+  const myHtml=myComplaints.length?`<div style="margin-top:14px">
+    <div class="sec-hint" style="margin-bottom:6px">已送出的投訴</div>
+    ${myComplaints.map(p=>`<div class="pending-custom-item" style="margin-bottom:6px">
+      <span style="font-size:18px">📢</span>
+      <span class="pci-name">${p.content.length>20?p.content.slice(0,20)+'...':p.content}</span>
+      <span class="pci-badge" style="background:var(--purple)">家長已收到</span>
+    </div>`).join('')}</div>`:'';
+  return`<div class="star-card" style="margin-bottom:14px">
+    <div class="sc-deco1">📢</div><div class="sc-deco2">💬</div>
+    <div style="font-size:40px;position:relative;margin-bottom:6px">📢</div>
+    <div class="big-label" style="font-size:18px;margin-top:0">投訴</div>
+    <div class="big-label" style="font-size:12px;margin-top:6px">有話想跟家長說？在這裡留言</div>
+  </div>
+  <div class="custom-task-card" style="border-color:var(--purple-mid)">
+    <div class="custom-task-title">💬 我有話要跟你說</div>
+    <textarea class="custom-input" id="complaintInput" placeholder="說清楚發生什麼事，家長會看到..." maxlength="150" rows="4" style="resize:none;height:90px;width:100%">${complaintText}</textarea>
+    <button class="custom-submit-btn" style="margin-top:12px;background:linear-gradient(135deg,var(--purple),var(--pink))" onclick="sfx('success');submitComplaint()">📤 送出</button>
+  </div>${myHtml}`;
+}
+function refreshComplaint(){complaintText=document.getElementById('complaintInput')?.value||'';}
+async function submitComplaint(){
+  const content=document.getElementById('complaintInput')?.value?.trim();
+  if(!content){toast('請填寫內容');sfx('error');return;}
+  if(!D.complaintsPending)D.complaintsPending=[];
+  D.complaintsPending.push({id:Date.now(),from:cu,content,time:nowS(),date:todayS()});
+  complaintText='';await sv();toast('📤 已送出！');render();
+}
+
+// ── RECORDS ──
+function rRecords(){
+  const par=isPar(),tid=par?D.children[ac].id:cu;
+  const ch=D.children.find(c=>c.id===tid);
+  const items=D.records[tid]||[];
+  const earned=items.filter(h=>h.plus).reduce((s,h)=>s+h.val,0);
+  const spent=items.filter(h=>!h.plus).reduce((s,h)=>s+h.val,0);
+  const sumHtml=`<div class="summary-row">
+    <div class="sum-card"><div class="sum-num total">${ch.stars}</div><div class="sum-label">目前點數</div></div>
+    <div class="sum-card"><div class="sum-num plus">+${earned}</div><div class="sum-label">累積獲得</div></div>
+    <div class="sum-card"><div class="sum-num minus">-${spent}</div><div class="sum-label">累積兌換</div></div>
+  </div>`;
+  if(!items.length)return`${sumHtml}<div class="empty"><span class="empty-icon">📒</span>還沒有集點記錄</div>`;
+  return`<div class="sec-header" style="margin-bottom:10px"><span class="sec-title">📒 ${uName(ch.id)} 的集點記錄</span></div>
+    ${sumHtml}
+    <div class="records-list">${items.slice(0,40).map(h=>`
+    <div class="hist-item ${h.plus?'plus':'minus'}">
+      <div class="hbadge ${h.plus?'plus':'minus'}">${h.plus?'⭐':'🎁'}</div>
+      <div class="hinfo"><div class="hname">${h.text}</div><div class="hwho">${h.who?h.who+'・':''}${h.time}</div></div>
+      <div class="hval ${h.plus?'plus':'minus'}">${h.plus?'+':'-'}${h.val}</div>
+    </div>`).join('')}</div>`;
+}
+
+// ── SETTINGS ──
+function rSettings(){
+  const par=isPar();
+  const myId=cu;
+  const myName=uName(myId);
+  const curPhoto=D.avatarPhotos&&D.avatarPhotos[myId];
+  const curEmoji=D.avatars?D.avatars[myId]:'👤';
+  const showPicker=editingAvatar===myId;
+  const emojiList=par?['👨','👩','🧔','👱','👩‍🦱','👩‍🦳','🧑‍🏫','🧑‍💼','🫂','❤️','🏠','⭐']:AVATAR_E;
+  const emojiPicker=emojiList.map(e=>`<button class="bep-btn ${e===selAvatar&&avatarTabMode==='emoji'?'active':''}" onclick="sfx();selAvatar='${e}';avatarTabMode='emoji';render()">${e}</button>`).join('');
+  const avatarSection=showPicker?`<div class="avatar-section">
+    <div style="text-align:center;margin-bottom:12px">
+      ${curPhoto&&avatarTabMode==='photo'?`<img src="${curPhoto}" class="avatar-preview">`:`<span class="avatar-emoji-preview">${selAvatar||curEmoji}</span>`}
+    </div>
+    <div class="avatar-tab-row">
+      <div class="avatar-tab ${avatarTabMode==='emoji'?'active':''}" onclick="sfx();avatarTabMode='emoji';render()">😊 選 Emoji</div>
+      <div class="avatar-tab ${avatarTabMode==='photo'?'active':''}" onclick="sfx();avatarTabMode='photo';render()">📷 上傳照片</div>
+    </div>
+    ${avatarTabMode==='emoji'?`<div class="big-emoji-picker">${emojiPicker}</div>`:`
+      <label class="upload-btn" onclick="document.getElementById('photoInput').click()">📷 點這裡選擇照片</label>
+      ${curPhoto?`<div style="text-align:center;margin-top:8px"><img src="${curPhoto}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--pink-mid)"></div>`:''}`}
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="form-cancel-btn" style="flex:1" onclick="sfx();editingAvatar=null;render()">取消</button>
+      <button class="form-save-btn" style="flex:2" onclick="sfx('success');saveAvatar()">✅ 儲存頭像</button>
+    </div></div>`:'';
+
+  const profileCard=`<div class="setting-card">
+    <div class="setting-row">
+      <div><div class="setting-lbl">顯示名稱</div><div class="setting-sub">更改後所有介面都會更新</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="myNameInput" class="form-input" style="width:100px;padding:6px 10px;font-size:14px" value="${myName}" maxlength="10">
+        <button class="s-btn" onclick="sfx('success');saveName('${myId}')">儲存</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-lbl">頭像</div><div class="setting-sub">可上傳照片或選 Emoji</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${avHtml(myId,36)}
+        <button class="s-btn" onclick="sfx();editingAvatar='${myId}';selAvatar='${curEmoji}';avatarTabMode='emoji';render()">更換</button>
+      </div>
+    </div>
+    ${avatarSection}
+  </div>`;
+
+  if(par){
+    const hasReq=(D.pinResetRequests||[]).some(r=>r.child===cu);
+    return`<div class="sec-header" style="margin-bottom:12px"><span class="sec-title">⚙️ 個人設定</span></div>
+    ${profileCard}
+    <div class="sec-header" style="margin-bottom:12px;margin-top:4px"><span class="sec-title">⚙️ 系統設定</span></div>
+    <div class="setting-card">
+      <div class="setting-row"><div><div class="setting-lbl">⏰ 每日 00:00 重置任務</div><div class="setting-sub">每天凌晨重置任務完成狀態</div></div><button class="toggle ${D.autoReset?'on':''}" onclick="sfx();togAuto()"></button></div>
+      <div class="setting-row"><div><div class="setting-lbl">🔄 立即重置今日任務</div></div><button class="s-btn" onclick="sfx();manReset()">重置</button></div>
+    </div>
+    <div class="setting-card">
+      <div class="setting-row"><div><div class="setting-lbl">🔑 修改爸爸密碼</div></div><button class="s-btn" onclick="sfx();openChangePin('dad')">修改</button></div>
+      <div class="setting-row"><div><div class="setting-lbl">🔑 修改媽媽密碼</div></div><button class="s-btn" onclick="sfx();openChangePin('mom')">修改</button></div>
+      <div class="setting-row"><div><div class="setting-lbl">🔑 修改 ${uName('jn')} 密碼</div></div><button class="s-btn" onclick="sfx();openChangePin('jn')">修改</button></div>
+      <div class="setting-row"><div><div class="setting-lbl">🔑 修改 ${uName('ju')} 密碼</div></div><button class="s-btn" onclick="sfx();openChangePin('ju')">修改</button></div>
+    </div>
+    <div class="setting-card">
+      <div class="setting-row"><div><div class="setting-lbl">${avHtml('jn',20)} ${uName('jn')} 累積點數</div></div><div class="stat-pill">${D.children[0].stars} ⭐</div></div>
+      <div class="setting-row"><div><div class="setting-lbl">${avHtml('ju',20)} ${uName('ju')} 累積點數</div></div><div class="stat-pill">${D.children[1].stars} ⭐</div></div>
+    </div>
+    <div class="setting-card">
+      <div class="setting-row"><div><div class="setting-lbl">🔄 重置點數與記錄</div><div class="setting-sub">只清除點數、集點記錄和待審核項目，你新增的任務和獎勵不會消失</div></div><button class="s-btn danger" onclick="sfx();clearAll()">只清點數</button></div>
+    </div>`;}
+  else{
+    const hasReq=(D.pinResetRequests||[]).some(r=>r.child===cu);
+    const ch=D.children.find(c=>c.id===cu);
+    return`<div class="sec-header" style="margin-bottom:12px"><span class="sec-title">⚙️ 我的設定</span></div>
+    ${profileCard}
+    <div class="setting-card">
+      <div class="setting-row"><div><div class="setting-lbl">⭐ 累積點數</div></div><div class="stat-pill">${ch?ch.stars:0} ⭐</div></div>
+    </div>
+    <div class="setting-card">
+      <div class="setting-row">
+        <div><div class="setting-lbl">🔑 申請重設密碼</div><div class="setting-sub">${hasReq?'已送出，等待家長審核中...':'忘記密碼？向家長申請重設'}</div></div>
+        <button class="s-btn orange" onclick="sfx();reqPinReset()" ${hasReq?'disabled style="opacity:0.5"':''}>
+          ${hasReq?'審核中':'申請'}
+        </button>
+      </div>
+    </div>`;}
+}
+function handlePhotoUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>500000){toast('照片太大，請選擇較小的圖片（500KB以下）');return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    if(!D.avatarPhotos)D.avatarPhotos={};
+    D.avatarPhotos[editingAvatar]=ev.target.result;
+    avatarTabMode='photo';render();
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+async function saveName(id){
+  const input=document.getElementById('myNameInput');
+  const name=(input?.value||'').trim();
+  if(!name){toast('請輸入名稱');return;}
+  if(!D.names)D.names={jn:'JN',ju:'JU',dad:'爸爸',mom:'媽媽'};
+  D.names[id]=name;
+  if(id==='jn'||id==='ju'){const ch=D.children.find(c=>c.id===id);if(ch)ch.name=name;}
+  await sv();syncLoginAvatars();updateUserPill();render();toast('✅ 名稱已更新！');
+}
+async function saveAvatar(){
+  const id=editingAvatar;
+  if(avatarTabMode==='emoji'){
+    if(!selAvatar)return;
+    if(!D.avatars)D.avatars={};
+    D.avatars[id]=selAvatar;
+    if(!D.avatarPhotos)D.avatarPhotos={};
+    D.avatarPhotos[id]=null;
+  }
+  editingAvatar=null;await sv();syncLoginAvatars();updateUserPill();render();toast('🎨 頭像已更新！');
+}
+async function togAuto(){D.autoReset=!D.autoReset;await sv();render();toast(D.autoReset?'✅ 自動重置已開啟':'❌ 自動重置已關閉');}
+async function manReset(){if(!confirm('確定要重置所有任務嗎？'))return;D.taskState={jn:{},ju:{}};D.lastReset=new Date().toDateString();await sv();render();toast('✨ 任務已重置！');}
+async function clearAll(){
+  if(!confirm('確定要重置點數和記錄嗎？\n你新增的任務和獎勵不會消失\n這無法復原！'))return;
+  // 暫停 polling 避免雲端舊資料覆蓋
+  if(syncTimer)clearInterval(syncTimer);
+  // 精準保留所有設定和自訂內容
+  const keepTasks=JSON.parse(JSON.stringify(D.tasks));
+  const keepRewards=JSON.parse(JSON.stringify(D.rewards));
+  const keepPins=JSON.parse(JSON.stringify(D.pins));
+  const keepAvatars=JSON.parse(JSON.stringify(D.avatars));
+  const keepPhotos=JSON.parse(JSON.stringify(D.avatarPhotos||{}));
+  const keepAutoReset=D.autoReset;
+  // 只清點數、記錄、審核佇列
+  D.children.forEach(ch=>{ch.stars=0;});
+  D.records={jn:[],ju:[]};
+  D.taskState={jn:{},ju:{}};
+  D.pending=[];
+  D.customPending=[];
+  D.rewardPending=[];
+  D.complaintsPending=[];
+  D.pinResetRequests=[];
+  D.lastReset=new Date().toDateString();
+  // 還原保留的內容
+  D.tasks=keepTasks;
+  D.rewards=keepRewards;
+  D.pins=keepPins;
+  D.avatars=keepAvatars;
+  D.avatarPhotos=keepPhotos;
+  D.autoReset=keepAutoReset;
+  // 先存本地，再存雲端，確保不被覆蓋
+  lsSave(D);
+  await gasSet(D);
+  lastHash=JSON.stringify(D);
+  render();
+  toast('✅ 點數和記錄已重置，任務和獎勵保留');
+  // 重新啟動 polling
+  startPoll();
+}
+// child requests reset: enters new pin first, stored in request (not applied yet)
+function reqPinReset(){
+  const u=cu;
+  if((D.pinResetRequests||[]).some(r=>r.child===u)){toast('已有申請中，等待家長審核');return;}
+  cpTarget=u;cpBuf='';cpStep='first';cpFirst='';cpCb=null;
+  window._pinReqMode=true;
+  document.getElementById('cpTitle').textContent='🔑 設定新密碼';
+  document.getElementById('cpDesc').textContent='請輸入你想要的新 4 位數密碼';
+  document.getElementById('cpErr').textContent='';
+  document.getElementById('changePinOverlay').classList.add('show');
+  updCp();
+}
+
+// ── CHANGE PIN ──
+function openChangePin(t,cb){
+  cpTarget=t;cpBuf='';cpStep='first';cpFirst='';cpCb=cb||null;
+  window._pinReqMode=false;
+  const nm={dad:'爸爸',mom:'媽媽',jn:'JN',ju:'JU'};
+  document.getElementById('cpTitle').textContent=`🔑 修改 ${nm[t]} 密碼`;
+  document.getElementById('cpDesc').textContent='請輸入新的 4 位數密碼';
+  document.getElementById('cpErr').textContent='';
+  document.getElementById('changePinOverlay').classList.add('show');updCp();
+}
+function closeChangePin(){
+  document.getElementById('changePinOverlay').classList.remove('show');
+  cpCb=null;window._pinReqMode=false;
+}
+function updCp(){for(let i=0;i<4;i++)document.getElementById('cpd'+i).classList.toggle('on',i<cpBuf.length);}
+function cpi(d){if(cpBuf.length>=4)return;cpBuf+=d;updCp();document.getElementById('cpErr').textContent='';
+  if(cpBuf.length===4){setTimeout(async()=>{
+    if(cpStep==='first'){
+      cpFirst=cpBuf;cpBuf='';cpStep='confirm';
+      document.getElementById('cpDesc').textContent='請再輸入一次確認';updCp();
+    } else {
+      if(cpBuf===cpFirst){
+        if(window._pinReqMode){
+          if(!D.pinResetRequests)D.pinResetRequests=[];
+          D.pinResetRequests.push({id:Date.now(),child:cpTarget,newPin:cpBuf,time:todayS()+' '+nowS()});
+          window._pinReqMode=false;
+          closeChangePin();await sv();render();
+          sfx('success');toast('📤 已送出密碼重設申請！');
+        } else {
+          D.pins[cpTarget]=cpBuf;sv();closeChangePin();
+          sfx('success');toast('✅ 密碼已更新！');
+          if(cpCb)cpCb();else render();
+        }
+      } else {
+        sfx('error');document.getElementById('cpErr').textContent='❌ 兩次密碼不同';
+        cpBuf='';cpFirst='';cpStep='first';
+        document.getElementById('cpDesc').textContent=window._pinReqMode?'請輸入你想要的新 4 位數密碼':'請輸入新的 4 位數密碼';
+        updCp();
+      }
+    }
+  },150);}
+}
+function cpDel(){if(cpBuf.length>0){cpBuf=cpBuf.slice(0,-1);updCp();}}
+
+// ── TOAST ──
+let tt;function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2800);}
+
+init();
+</script>
+</body>
+</html>

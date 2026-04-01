@@ -2,662 +2,190 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JENTECH 人評會投票</title>
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
-:root{
-  --bg:#f4f4f6;--sf:#fff;--sf2:#f0f0f4;--sf3:#e8e8ee;
-  --bd:#dddde8;--bd2:#c8c8d8;
-  --tx:#111118;--txd:#888899;--txl:#555566;
-  --ac:#6c63ff;--ac2:#ff6584;--ac3:#22c55e;--gold:#f59e0b;
-  --pass:#22c55e;--fail:#ef4444;--abs:#f59e0b;
-  --nav-h:64px;
+body{font-family:sans-serif;background:#f4f4f6;margin:0}
+
+/* 卡片 */
+.cc{
+  background:#fff;
+  margin:10px;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  position:relative;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav-h);}
-#login-screen{position:fixed;inset:0;background:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
-.login-box{width:100%;max-width:380px;text-align:center;}
-.login-logo-area{margin-bottom:28px;display:flex;flex-direction:column;align-items:center;gap:10px;}
-.jentech-logo{font-size:32px;font-weight:900;color:#e11d48;letter-spacing:.06em;line-height:1;}
-.login-title{font-size:18px;font-weight:700;color:var(--tx);margin-bottom:2px;}
-.login-title span{color:var(--ac);}
-.login-sub-text{font-size:12px;color:var(--txd);}
-.login-note{font-size:12px;color:var(--txd);margin-bottom:24px;}
-.login-form{display:flex;flex-direction:column;gap:12px;}
-.login-field{text-align:left;}
-.login-label{display:block;font-size:11px;color:var(--txd);letter-spacing:.07em;margin-bottom:5px;font-family:'Space Mono',monospace;}
-.login-input{width:100%;background:var(--sf2);border:1.5px solid var(--bd);border-radius:10px;padding:13px 15px;color:var(--tx);font-family:'Noto Sans TC',sans-serif;font-size:15px;outline:none;transition:all .2s;}
-.login-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(108,99,255,.1);background:#fff;}
-.login-input::placeholder{color:var(--txd);}
-.login-btn{width:100%;background:#111;color:#fff;border:none;border-radius:10px;padding:14px;font-family:'Noto Sans TC',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px;}
-.login-btn:hover{background:#333;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-around;z-index:100;}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 0;border:none;background:transparent;cursor:pointer;transition:all .2s;color:var(--txd);font-family:'Noto Sans TC',sans-serif;position:relative;}
-.nav-btn.active{color:var(--tx);}
-.nav-icon{font-size:20px;transition:transform .2s;}
-.nav-btn.active .nav-icon{transform:translateY(-2px);}
-.nav-label{font-size:10px;font-weight:700;letter-spacing:.03em;}
-.nav-bar{position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:2.5px;border-radius:100px;background:var(--tx);opacity:0;transition:opacity .2s;}
-.nav-btn.active .nav-bar{opacity:1;}
-.page{display:none;min-height:calc(100vh - var(--nav-h));}
-.page.active{display:block;}
-.page-header{padding:18px 16px 12px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10;}
-.page-title{font-size:20px;font-weight:900;color:var(--tx);}
-.page-title span{color:var(--ac);}
-.page-sub{font-size:11px;color:var(--txd);margin-top:2px;}
-.user-chip{display:inline-flex;align-items:center;gap:7px;background:var(--sf2);border-radius:100px;padding:4px 11px 4px 4px;margin-top:8px;border:1px solid var(--bd);}
-.user-av{width:24px;height:24px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;}
-.user-info{font-size:11px;font-weight:700;color:var(--tx);}
-.user-id-txt{font-size:9px;color:var(--txd);font-family:'Space Mono',monospace;}
-.logout-btn{margin-left:4px;background:transparent;border:none;color:var(--txd);font-size:10px;cursor:pointer;padding:2px 5px;border-radius:4px;font-family:'Noto Sans TC',sans-serif;}
-.logout-btn:hover{color:var(--fail);}
-.auth-wall{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--txd);}
-.auth-wall-icon{font-size:40px;margin-bottom:12px;}
-.auth-wall-text{font-size:14px;margin-bottom:6px;color:var(--txl);}
-.auth-wall-sub{font-size:12px;}
-.cards-list{padding:12px 14px 16px;display:flex;flex-direction:column;gap:12px;}
-.cc{background:#fff;border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;}
-.cc.voted-pass{border-color:var(--pass);}
-.cc.voted-fail{border-color:var(--fail);}
-.cc.voted-abs{border-color:var(--abs);}
-.cc-head{background:var(--sf2);padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:flex-start;}
-.cc-case{font-family:'Space Mono',monospace;font-size:9px;color:var(--txd);letter-spacing:.1em;margin-bottom:2px;}
-.cc-name{font-size:18px;font-weight:900;color:var(--tx);}
-.cc-dept{font-size:11px;color:var(--txl);margin-top:1px;}
-.cc-empid{font-family:'Space Mono',monospace;font-size:9px;color:var(--txd);}
-.my-vote-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:100px;font-size:10px;font-weight:700;flex-shrink:0;}
-.mvb-pass{background:rgba(34,197,94,.1);color:var(--pass);border:1px solid rgba(34,197,94,.3);}
-.mvb-fail{background:rgba(239,68,68,.1);color:var(--fail);border:1px solid rgba(239,68,68,.3);}
-.mvb-abs{background:rgba(245,158,11,.1);color:var(--abs);border:1px solid rgba(245,158,11,.3);}
-.cc-body{padding:12px 14px;}
-.info-pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
-.pill{background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:4px 9px;}
-.pill-label{color:var(--txd);font-size:8px;font-family:'Space Mono',monospace;letter-spacing:.05em;margin-bottom:1px;}
-.pill-val{font-weight:700;font-size:11px;color:var(--tx);}
-.promo-row{background:var(--sf2);border-radius:9px;padding:8px 11px;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--bd);}
-.ptag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;}
-.ptag-b{background:var(--sf3);color:var(--txl);}
-.ptag-a{background:#111;color:#fff;}
-.p-arrow{color:var(--txd);font-size:14px;font-weight:700;}
-.promo-type-tag{margin-left:auto;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;background:var(--sf3);color:var(--txl);border:1px solid var(--bd);}
-.vote-section{margin-bottom:10px;}
-.vote-row-label{font-size:9px;color:var(--txd);letter-spacing:.07em;margin-bottom:7px;font-family:'Space Mono',monospace;}
-.vote-btns{display:flex;gap:7px;}
-.vbtn{flex:1;border:none;border-radius:9px;padding:10px 4px;font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;gap:3px;}
-.vbtn.pass{background:rgba(34,197,94,.08);color:var(--pass);border-color:rgba(34,197,94,.3);}
-.vbtn.pass.sel{background:var(--pass);color:#fff;border-color:var(--pass);}
-.vbtn.fail{background:rgba(239,68,68,.07);color:var(--fail);border-color:rgba(239,68,68,.25);}
-.vbtn.fail.sel{background:var(--fail);color:#fff;border-color:var(--fail);}
-.vbtn.abs{background:rgba(245,158,11,.07);color:var(--abs);border-color:rgba(245,158,11,.25);}
-.vbtn.abs.sel{background:var(--abs);color:#fff;border-color:var(--abs);}
-.fail-reasons{background:rgba(239,68,68,.04);border-radius:9px;padding:9px 11px;margin-bottom:9px;border:1px solid rgba(239,68,68,.2);animation:slideDown .2s ease-out;}
-@keyframes slideDown{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-.fr-title{font-size:9px;color:var(--fail);letter-spacing:.07em;margin-bottom:7px;font-family:'Space Mono',monospace;}
-.fr-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
-.fr-item{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:6px;cursor:pointer;transition:background .15s;}
-.fr-item:hover{background:rgba(239,68,68,.06);}
-.fr-item input{width:13px;height:13px;accent-color:var(--fail);flex-shrink:0;cursor:pointer;}
-.fr-item label{cursor:pointer;color:var(--tx);margin:0;font-family:'Noto Sans TC',sans-serif;font-size:11px;line-height:1.3;}
-.res-wrap{margin-bottom:9px;}
-.res-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.res-lbl{font-size:9px;color:var(--txd);}
-.res-nums{font-size:10px;font-family:'Space Mono',monospace;color:var(--txd);}
-.res-bar{height:4px;background:var(--sf3);border-radius:100px;overflow:hidden;display:flex;}
-.rb-p{height:100%;background:var(--pass);transition:width .6s cubic-bezier(.34,1.56,.64,1);}
-.rb-f{height:100%;background:var(--fail);transition:width .6s cubic-bezier(.34,1.56,.64,1);}
-.rb-a{height:100%;background:var(--abs);transition:width .6s cubic-bezier(.34,1.56,.64,1);}
-.submit-btn{width:100%;padding:11px;background:#111;color:#fff;border:none;border-radius:9px;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:5px;}
-.submit-btn:hover{background:#333;}
-.no-cases{text-align:center;padding:48px 20px;color:var(--txd);}
-.results-grid{padding:10px 12px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
-@media(max-width:540px){.results-grid{grid-template-columns:repeat(2,1fr);}}
-.rc{background:#fff;border:2px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
-.rc.leading-pass{border-color:var(--pass);}
-.rc.leading-fail{border-color:var(--fail);}
-.rc-accent{height:4px;background:var(--bd);}
-.rc.leading-pass .rc-accent{background:var(--pass);}
-.rc.leading-fail .rc-accent{background:var(--fail);}
-.rc-inner{padding:10px;flex:1;display:flex;flex-direction:column;gap:6px;}
-.rc-name{font-size:15px;font-weight:900;color:var(--tx);line-height:1.15;}
-.rc-dept{font-size:10px;color:var(--txd);line-height:1.3;}
-.verdict-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:900;align-self:flex-start;}
-.vb-pass{background:rgba(34,197,94,.12);color:var(--pass);border:1.5px solid rgba(34,197,94,.35);}
-.vb-fail{background:rgba(239,68,68,.1);color:var(--fail);border:1.5px solid rgba(239,68,68,.3);}
-.vb-tie{background:var(--sf2);color:var(--txd);border:1.5px solid var(--bd);}
-.rc-counts{display:flex;gap:4px;margin-top:auto;}
-.rc-count-item{flex:1;background:var(--sf2);border-radius:7px;padding:5px 3px;text-align:center;}
-.rc-count-num{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;line-height:1;}
-.rc-count-lbl{font-size:9px;color:var(--txd);margin-top:2px;}
-.rc-count-item.p .rc-count-num{color:var(--pass);}
-.rc-count-item.f .rc-count-num{color:var(--fail);}
-.rc-count-item.a .rc-count-num{color:var(--abs);}
-.rc-bar{height:4px;background:var(--sf2);border-radius:100px;overflow:hidden;display:flex;margin-top:2px;}
-.settings-body{padding:14px;display:flex;flex-direction:column;gap:11px;}
-.settings-section{background:#fff;border:1px solid var(--bd);border-radius:14px;overflow:hidden;}
-.ss-title{font-size:10px;color:var(--txd);letter-spacing:.1em;font-family:'Space Mono',monospace;padding:11px 15px 7px;display:flex;justify-content:space-between;align-items:center;}
-.admin-form{padding:0 15px 14px;display:flex;flex-direction:column;gap:9px;}
-.afg{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.fg{min-width:0;}
-.fg.full{grid-column:1/-1;}
-input[type="text"],input[type="password"],input[type="date"],select,textarea{font-family:'Noto Sans TC',sans-serif;font-size:13px;color:var(--tx);background:var(--sf2);border:1.5px solid var(--bd);border-radius:8px;outline:none;transition:border-color .2s;padding:8px 11px;width:100%;}
-input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(108,99,255,.1);}
-input::placeholder{color:var(--txd);}
-input[readonly]{background:var(--sf3);color:var(--txl);cursor:default;}
-.field-label{font-size:9px;color:var(--txd);letter-spacing:.07em;margin-bottom:3px;font-family:'Space Mono',monospace;}
-.promo-form{background:var(--sf2);border-radius:9px;padding:10px;border:1px solid var(--bd);}
-.pf-grid{display:grid;grid-template-columns:1fr 18px 1fr;gap:6px;margin-bottom:5px;}
-.pf-arrow{display:flex;align-items:center;justify-content:center;color:var(--txd);font-size:13px;font-weight:700;}
-.pf-head{font-size:8px;text-align:center;font-family:'Space Mono',monospace;margin-bottom:3px;color:var(--txd);}
-.pf-head.after{color:var(--tx);}
-.btn{border:none;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:4px;}
-.btn-p{background:#111;color:#fff;padding:9px 16px;font-size:13px;}
-.btn-p:hover{background:#333;}
-.btn-d{background:rgba(239,68,68,.1);color:var(--fail);border:1px solid rgba(239,68,68,.25);padding:6px 11px;font-size:11px;}
-.btn-s{background:var(--sf2);color:var(--tx);border:1px solid var(--bd);padding:6px 11px;font-size:11px;}
-.btn-danger{background:rgba(239,68,68,.07);color:var(--fail);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 15px;font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:700;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:7px;}
-.acli{display:flex;align-items:center;gap:9px;padding:9px 15px;border-top:1px solid var(--bd);}
-.acli-info{flex:1;min-width:0;}
-.acli-name{font-size:12px;font-weight:700;color:var(--tx);}
-.acli-sub{font-size:10px;color:var(--txd);margin-top:1px;}
-.acli-votes{font-size:10px;text-align:right;line-height:1.7;margin-right:7px;flex-shrink:0;font-family:'Space Mono',monospace;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:none;align-items:flex-end;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;}
-.modal-title{font-size:16px;font-weight:900;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
-.modal-close{background:transparent;border:none;font-size:20px;cursor:pointer;color:var(--txd);padding:0 4px;}
-.rec-scroll{overflow-x:auto;padding:0 15px 14px;}
-table{width:100%;border-collapse:collapse;min-width:480px;}
-th{padding:7px 9px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--txd);font-family:'Space Mono',monospace;font-weight:400;border-bottom:1px solid var(--bd);}
-td{padding:7px 9px;font-size:11px;border-bottom:1px solid var(--bd);vertical-align:top;color:var(--tx);}
-tr:last-child td{border-bottom:none;}
-.rtag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;}
-.rtag-p{background:rgba(34,197,94,.12);color:var(--pass);}
-.rtag-f{background:rgba(239,68,68,.1);color:var(--fail);}
-.rtag-a{background:rgba(245,158,11,.1);color:var(--abs);}
-.empty-s{text-align:center;padding:24px;color:var(--txd);font-size:12px;}
-.admin-login-inner{padding:14px;display:flex;flex-direction:column;gap:9px;}
-.toast{position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;transform:translateX(-50%) translateY(16px);background:#111;border-radius:10px;padding:10px 18px;font-size:12px;font-weight:500;box-shadow:0 6px 24px rgba(0,0,0,.2);transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:400;white-space:nowrap;color:#fff;opacity:0;pointer-events:none;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.toast.error{background:var(--fail);}
-.connecting{text-align:center;padding:40px;color:var(--txd);font-size:13px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:20px;height:20px;border:2px solid var(--bd);border-top-color:var(--tx);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* 投票後淡化 */
+.cc.voted-pass,
+.cc.voted-fail,
+.cc.voted-abs{
+  background:rgba(0,0,0,0.02);
+  opacity:0.75;
+}
+
+/* 按鈕 */
+.submit-btn{
+  width:100%;
+  padding:10px;
+  background:#111;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  margin-top:8px;
+}
+
+/* 投過變灰 */
+.submit-btn.voted{
+  background:#eee;
+  color:#888;
+}
+
+/* 已投票浮標 */
+.voted-badge{
+  position:absolute;
+  top:8px;
+  right:8px;
+  background:rgba(34,197,94,.1);
+  color:#22c55e;
+  border:1px solid rgba(34,197,94,.3);
+  font-size:10px;
+  padding:3px 6px;
+  border-radius:999px;
+}
+
+/* 動畫 */
+.check-anim{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.5);
+  font-size:60px;
+  color:#22c55e;
+  opacity:0;
+}
+
+.check-anim.show{
+  animation:pop .6s ease;
+}
+
+@keyframes pop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}
+  100%{opacity:0;}
+}
 </style>
 </head>
+
 <body>
 
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo-area">
-      <div class="jentech-logo">JENTECH</div>
-      <div>
-        <div class="login-title">人評會<span>投票系統</span></div>
-        <div class="login-sub-text">Promotion Review Committee</div>
-      </div>
-    </div>
-    <div class="login-note">請輸入工號姓名進入投票</div>
-    <div class="login-form">
-      <div class="login-field">
-        <label class="login-label">工號 EMPLOYEE ID</label>
-        <input type="text" class="login-input" id="li-empid" placeholder="請輸入工號" maxlength="20" onkeydown="if(event.key==='Enter')document.getElementById('li-name').focus()">
-      </div>
-      <div class="login-field">
-        <label class="login-label">姓名 NAME</label>
-        <input type="text" class="login-input" id="li-name" placeholder="請輸入姓名" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <button class="login-btn" onclick="doLogin()">進入投票系統 →</button>
-    </div>
-  </div>
-</div>
+<div id="app"></div>
 
-<div id="app" style="display:none;">
-  <div class="page active" id="page-vote">
-    <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;">
-        <div><div class="page-title">人員晉升<span>投票</span></div><div class="page-sub">每案件可個別投票，投後可修改</div></div>
-        <div class="user-chip">
-          <div class="user-av" id="uav1"></div>
-          <div><div class="user-info" id="uname1"></div><div class="user-id-txt" id="uid1"></div></div>
-          <button class="logout-btn" onclick="doLogout()">登出</button>
-        </div>
-      </div>
-    </div>
-    <div id="connecting" class="connecting"><div class="spinner"></div>載入資料中...</div>
-    <div class="cards-list" id="cards-list"></div>
-  </div>
-
-  <div class="page" id="page-results">
-    <div class="page-header">
-      <div class="page-title">即時<span>結果</span></div>
-      <div class="page-sub">管理員登入後可查看</div>
-    </div>
-    <div id="results-stats" style="display:flex;gap:8px;padding:10px 14px 0;overflow-x:auto;scrollbar-width:none;">
-      <div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:8px 13px;display:flex;align-items:center;gap:7px;flex-shrink:0;">
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--pass);animation:pulse 2s infinite;"></div>
-        <div><div style="font-size:9px;color:var(--txd);">總票數</div><div id="sv-total" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;">0</div></div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:8px 13px;display:flex;align-items:center;gap:7px;flex-shrink:0;">
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--tx);animation:pulse 2s infinite .5s;"></div>
-        <div><div style="font-size:9px;color:var(--txd);">參與委員</div><div id="sv-voters" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;">0</div></div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:8px 13px;display:flex;align-items:center;gap:7px;flex-shrink:0;">
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--abs);animation:pulse 2s infinite 1s;"></div>
-        <div><div style="font-size:9px;color:var(--txd);">審核案件</div><div id="sv-cands" style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;">0</div></div>
-      </div>
-    </div>
-    <div id="results-auth-wall" class="auth-wall">
-      <div class="auth-wall-icon">🔒</div>
-      <div class="auth-wall-text">請先在設定頁登入管理員</div>
-      <div class="auth-wall-sub">才能查看完整投票結果</div>
-    </div>
-    <div class="results-grid" id="results-grid" style="display:none;"></div>
-  </div>
-
-  <div class="page" id="page-settings">
-    <div class="page-header">
-      <div class="page-title"><span>設定</span></div>
-      <div class="page-sub">後台管理</div>
-    </div>
-    <div class="settings-body">
-      <div class="settings-section" id="admin-login-section">
-        <div class="ss-title">後台管理員登入</div>
-        <div class="admin-login-inner">
-          <input type="password" id="admin-pw" placeholder="輸入管理員密碼" onkeydown="if(event.key==='Enter')adminLogin()">
-          <button class="btn btn-p" style="width:100%;justify-content:center;" onclick="adminLogin()">登入管理後台</button>
-        </div>
-      </div>
-      <div id="admin-dash" style="display:none;flex-direction:column;gap:11px;">
-        <div class="settings-section">
-          <div class="ss-title">管理員已登入 <button class="logout-btn" onclick="adminLogout()">登出</button></div>
-        </div>
-        <div class="settings-section">
-          <div class="ss-title">➕ 新增審核案件</div>
-          <div class="admin-form">
-            <div class="afg">
-              <div class="fg"><div class="field-label">工號 *</div><input type="text" id="n-empid" placeholder="員工工號"></div>
-              <div class="fg"><div class="field-label">姓名 *</div><input type="text" id="n-name" placeholder="員工姓名"></div>
-              <div class="fg"><div class="field-label">處</div><input type="text" id="n-div" placeholder="例：研發一處"></div>
-              <div class="fg"><div class="field-label">部</div><input type="text" id="n-dept" placeholder="例：複合沖壓部"></div>
-              <div class="fg full"><div class="field-label">課</div><input type="text" id="n-sec" placeholder="若無可空白"></div>
-              <div class="fg"><div class="field-label">當期績效等第</div>
-                <select id="n-perf"><option value="">請選擇</option><option>傑出</option><option>優秀</option><option>良好</option></select>
-              </div>
-              <div class="fg"><div class="field-label">入職日（自動計算年資）</div><input type="date" id="n-joindate" onchange="calcTenure('n-joindate','n-tenure')"></div>
-              <div class="fg"><div class="field-label">年資（自動帶出）</div><input type="text" id="n-tenure" placeholder="填入職日後自動計算" readonly></div>
-              <div class="fg"><div class="field-label">異動類別</div>
-                <select id="n-movetype"><option value="">請選擇</option><option>真除代理</option><option>提報代理</option><option>晉升晉等</option><option>晉等</option></select>
-              </div>
-              <div class="fg"><div class="field-label">審查方式</div>
-                <select id="n-reviewtype"><option value="">請選擇</option><option>一級</option><option>二級</option><option>三級</option><option>書審</option></select>
-              </div>
-            </div>
-            <div class="field-label" style="margin-bottom:0;">異動前 → 異動後</div>
-            <div class="promo-form">
-              <div style="display:grid;grid-template-columns:1fr 18px 1fr;gap:6px;margin-bottom:3px;">
-                <div class="pf-head">異動前</div><div></div><div class="pf-head after">異動後</div>
-              </div>
-              <div class="pf-grid"><input type="text" id="n-bg" placeholder="職等"><div class="pf-arrow">→</div><input type="text" id="n-ag" placeholder="職等"></div>
-              <div class="pf-grid"><input type="text" id="n-bt" placeholder="職稱"><div class="pf-arrow">→</div><input type="text" id="n-at" placeholder="職稱"></div>
-            </div>
-            <button class="btn btn-p" onclick="addCandidate()">新增審核案件</button>
-          </div>
-        </div>
-        <div class="settings-section">
-          <div class="ss-title">📋 現有審核案件</div>
-          <div id="admin-clist"><div class="empty-s">尚無案件</div></div>
-        </div>
-        <div class="settings-section">
-          <div class="ss-title">🔍 完整投票紀錄</div>
-          <div class="rec-scroll">
-            <table><thead><tr><th>#</th><th>委員</th><th>工號</th><th>案件</th><th>結果</th><th>不通過原因</th><th>時間</th></tr></thead>
-            <tbody id="rtbody"></tbody></table>
-            <div id="empty-r" class="empty-s" style="display:none;">📭 尚無投票紀錄</div>
-          </div>
-        </div>
-        <button class="btn-danger" onclick="resetAll()">⚠️ 清除所有票數與紀錄</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<nav class="bottom-nav" id="bottom-nav" style="display:none;">
-  <button class="nav-btn active" onclick="switchPage('vote',this)"><div class="nav-bar"></div><div class="nav-icon">🗳️</div><div class="nav-label">投票</div></button>
-  <button class="nav-btn" onclick="switchPage('results',this)"><div class="nav-bar"></div><div class="nav-icon">📊</div><div class="nav-label">結果</div></button>
-  <button class="nav-btn" onclick="switchPage('settings',this)"><div class="nav-bar"></div><div class="nav-icon">⚙️</div><div class="nav-label">設定</div></button>
-</nav>
-
-<div class="modal-overlay" id="edit-modal">
-  <div class="modal-box">
-    <div class="modal-title">修改案件資料 <button class="modal-close" onclick="closeEditModal()">✕</button></div>
-    <div style="display:flex;flex-direction:column;gap:9px;">
-      <input type="hidden" id="edit-id">
-      <div class="afg">
-        <div class="fg"><div class="field-label">工號</div><input type="text" id="e-empid"></div>
-        <div class="fg"><div class="field-label">姓名</div><input type="text" id="e-name"></div>
-        <div class="fg"><div class="field-label">處</div><input type="text" id="e-div"></div>
-        <div class="fg"><div class="field-label">部</div><input type="text" id="e-dept"></div>
-        <div class="fg full"><div class="field-label">課</div><input type="text" id="e-sec"></div>
-        <div class="fg"><div class="field-label">當期績效等第</div><select id="e-perf"><option value="">請選擇</option><option>傑出</option><option>優秀</option><option>良好</option></select></div>
-        <div class="fg"><div class="field-label">入職日</div><input type="date" id="e-joindate" onchange="calcTenure('e-joindate','e-tenure')"></div>
-        <div class="fg"><div class="field-label">年資</div><input type="text" id="e-tenure" readonly></div>
-        <div class="fg"><div class="field-label">異動類別</div><select id="e-movetype"><option value="">請選擇</option><option>真除代理</option><option>提報代理</option><option>晉升晉等</option><option>晉等</option></select></div>
-        <div class="fg"><div class="field-label">審查方式</div><select id="e-reviewtype"><option value="">請選擇</option><option>一級</option><option>二級</option><option>三級</option><option>書審</option></select></div>
-      </div>
-      <div class="field-label" style="margin-bottom:0;">異動前 → 異動後</div>
-      <div class="promo-form">
-        <div style="display:grid;grid-template-columns:1fr 18px 1fr;gap:6px;margin-bottom:3px;"><div class="pf-head">異動前</div><div></div><div class="pf-head after">異動後</div></div>
-        <div class="pf-grid"><input type="text" id="e-bg" placeholder="職等"><div class="pf-arrow">→</div><input type="text" id="e-ag" placeholder="職等"></div>
-        <div class="pf-grid"><input type="text" id="e-bt" placeholder="職稱"><div class="pf-arrow">→</div><input type="text" id="e-at" placeholder="職稱"></div>
-      </div>
-      <button class="btn btn-p" style="width:100%;justify-content:center;" onclick="saveEdit()">儲存修改</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<div id="checkAnim" class="check-anim">✓</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
-firebase.initializeApp({apiKey:"AIzaSyA2ZpeIZDLEpysnECE0WMvYoUkbrZ-SnK8",authDomain:"voting-system-6629b.firebaseapp.com",databaseURL:"https://voting-system-6629b-default-rtdb.firebaseio.com",projectId:"voting-system-6629b",storageBucket:"voting-system-6629b.firebasestorage.app",messagingSenderId:"769201801560",appId:"1:769201801560:web:f4144db3ad9310855cbd2d"});
+
+/* Firebase */
+firebase.initializeApp({
+  apiKey:"AIzaSyA2Zpe...",
+  databaseURL:"https://voting-system-6629b-default-rtdb.firebaseio.com"
+});
 const db=firebase.database();
-const ADMIN_PW='admin123';
-const FAIL_REASONS=[
-  {key:'professional',label:'職務專業能力不足'},{key:'motivate',label:'激勵部屬能力'},
-  {key:'develop',label:'培育部屬能力'},{key:'assist',label:'協助發展能力'},
-  {key:'perf_mgmt',label:'績效管理能力'},{key:'plan',label:'計劃與組織能力'},
-  {key:'work_mgmt',label:'工作管理能力'},{key:'followup',label:'進度跟催能力'},
-  {key:'communicate',label:'溝通協調能力'},{key:'problem',label:'問題解決能力'},
-];
-let S={voter:null,candidates:{},records:[],sel:{},failSel:{},myVotes:{},myVoteKeys:{}};
-let adminOn=false;
 
-function calcTenure(dateInputId,tenureInputId){
-  const v=document.getElementById(dateInputId).value;if(!v)return;
-  const join=new Date(v),today=new Date();
-  let y=today.getFullYear()-join.getFullYear(),m=today.getMonth()-join.getMonth();
-  if(m<0){y--;m+=12;}
-  document.getElementById(tenureInputId).value=y+'年'+m+'月';
+/* 狀態 */
+let S={
+  voter:{name:"測試",empId:"001"},
+  candidates:{},
+  records:[],
+  myVotes:{}
+};
+
+/* 防重複 */
+function hasVoted(cid){
+  return localStorage.getItem("vote_"+cid)==="1";
+}
+function markVoted(cid){
+  localStorage.setItem("vote_"+cid,"1");
 }
 
-function doLogin(){
-  const empId=document.getElementById('li-empid').value.trim();
-  const name=document.getElementById('li-name').value.trim();
-  if(!name||!empId){showToast('請填寫工號與姓名',true);return;}
-  S.voter={name,empId};S.sel={};S.failSel={};
-  rebuildMyVotes();
-  Object.entries(S.myVotes).forEach(([cid,rec])=>{
-    S.sel[cid]=rec.result;
-    if(rec.result==='fail'&&rec.failReasons){S.failSel[cid]={};rec.failReasons.forEach(k=>{S.failSel[cid][k]=true;});}
-  });
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('bottom-nav').style.display='flex';
-  document.getElementById('uav1').textContent=name.charAt(0);
-  document.getElementById('uname1').textContent=name;
-  document.getElementById('uid1').textContent=empId;
-  renderCandidates();renderResults();
+/* 動畫 */
+function showCheck(){
+  const el=document.getElementById("checkAnim");
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),600);
 }
 
-function doLogout(){
-  S.voter=null;S.sel={};S.failSel={};S.myVotes={};S.myVoteKeys={};
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('app').style.display='none';
-  document.getElementById('bottom-nav').style.display='none';
-  document.getElementById('li-empid').value='';
-  document.getElementById('li-name').value='';
-}
-
-function rebuildMyVotes(){
-  if(!S.voter)return;S.myVotes={};
-  S.records.forEach(r=>{if(r.empId===S.voter.empId)S.myVotes[r.candidateId]=r;});
-}
-
-db.ref('candidates').on('value',snap=>{
+/* 讀資料 */
+db.ref("candidates").on("value",snap=>{
   S.candidates=snap.val()||{};
-  document.getElementById('connecting').style.display='none';
-  renderCandidates();renderResults();updateStats();
-  if(adminOn)renderAdminList();
+  render();
 });
 
-db.ref('vote_records').on('value',snap=>{
-  const data=snap.val()||{};S.myVoteKeys={};S.records=[];
-  Object.entries(data).forEach(([key,val])=>{
-    S.records.push({...val,_key:key});
-    if(S.voter&&val.empId===S.voter.empId)S.myVoteKeys[val.candidateId]=key;
-  });
-  S.records.sort((a,b)=>b.timestamp-a.timestamp);
-  rebuildMyVotes();
-  if(S.voter){Object.entries(S.myVotes).forEach(([cid,rec])=>{if(!S.sel[cid]){S.sel[cid]=rec.result;if(rec.result==='fail'&&rec.failReasons){S.failSel[cid]={};rec.failReasons.forEach(k=>{S.failSel[cid][k]=true;});}}});}
-  updateStats();renderCandidates();renderResults();
-  if(adminOn)renderRecords();
-});
+db.ref("vote_records").on("value",snap=>{
+  const data=snap.val()||{};
+  S.records=Object.values(data);
 
-function selectVote(cid,val){
-  S.sel[cid]=val;
-  ['pass','fail','abs'].forEach(t=>{const el=document.getElementById('vb-'+cid+'-'+t);if(el)el.classList.toggle('sel',t===val);});
-  const fr=document.getElementById('fr-'+cid);if(fr)fr.style.display=val==='fail'?'block':'none';
-}
-function toggleFR(cid,key,checked){if(!S.failSel[cid])S.failSel[cid]={};S.failSel[cid][key]=checked;}
-function toggleFRClick(cid,key){const cb=document.getElementById('fr-'+cid+'-'+key);if(cb){cb.checked=!cb.checked;toggleFR(cid,key,cb.checked);}}
-
-async function submitVote(cid){
-  if(!S.voter){showToast('請先登入',true);return;}
-  const result=S.sel[cid];if(!result){showToast('請選擇通過、不通過或棄權',true);return;}
-  const c=S.candidates[cid];if(!c)return;
-  const failReasons=result==='fail'?Object.entries(S.failSel[cid]||{}).filter(([,v])=>v).map(([k])=>k):[];
-  const existing=S.myVotes[cid];const isModify=!!existing;
-  try{
-    if(isModify){
-      const oldField=existing.result==='pass'?'passCount':existing.result==='fail'?'failCount':'absCount';
-      await db.ref('candidates/'+cid+'/'+oldField).transaction(v=>Math.max(0,(v||0)-1));
-      const oldKey=S.myVoteKeys[cid];if(oldKey)await db.ref('vote_records/'+oldKey).remove();
+  S.myVotes={};
+  S.records.forEach(r=>{
+    if(r.empId===S.voter.empId){
+      S.myVotes[r.candidateId]=r;
     }
-    const newField=result==='pass'?'passCount':result==='fail'?'failCount':'absCount';
-    await db.ref('candidates/'+cid+'/'+newField).transaction(v=>(v||0)+1);
-    await db.ref('vote_records').push({empId:S.voter.empId,name:S.voter.name,candidateId:cid,candidateName:c.name,result,failReasons,timestamp:Date.now(),time:new Date().toLocaleString('zh-TW')});
-    showToast(isModify?'✅ 已修改投票結果':'✅ 已完成「'+c.name+'」投票');
-  }catch(e){showToast('提交失敗，請重試',true);}
+  });
+
+  render();
+});
+
+/* 投票 */
+async function vote(id,type){
+  if(hasVoted(id)) return alert("已投過");
+
+  const field=type==="pass"?"passCount":
+               type==="fail"?"failCount":"absCount";
+
+  await db.ref("candidates/"+id+"/"+field)
+    .transaction(v=>(v||0)+1);
+
+  await db.ref("vote_records").push({
+    candidateId:id,
+    empId:S.voter.empId,
+    result:type
+  });
+
+  markVoted(id);
+  showCheck();
 }
 
-function renderCandidates(){
-  const list=document.getElementById('cards-list');
-  const entries=Object.entries(S.candidates);
-  if(!entries.length){list.innerHTML='<div class="no-cases"><div style="font-size:40px;margin-bottom:10px">📋</div><p>尚無審核案件<br><span style="font-size:11px">請至設定頁新增</span></p></div>';return;}
-  list.innerHTML=entries.map(([id],i)=>buildCard(id,i+1)).join('');
-}
+/* UI */
+function render(){
+  let html="";
 
-function buildCard(id,idx){
-  const c=S.candidates[id];if(!c)return'';
-  const pC=c.passCount||0,fC=c.failCount||0,aC=c.absCount||0,total=pC+fC+aC;
-  const pPct=total>0?Math.round(pC/total*100):0,fPct=total>0?Math.round(fC/total*100):0,aPct=total>0?Math.round(aC/total*100):0;
-  const myVote=S.myVotes[id],hasVoted=!!myVote,curSel=S.sel[id]||'',noLogin=!S.voter;
-  let mvBadge='';
-  if(hasVoted){const rv=myVote.result;mvBadge=`<span class="my-vote-badge ${rv==='pass'?'mvb-pass':rv==='fail'?'mvb-fail':'mvb-abs'}">${rv==='pass'?'✓ 已投通過':rv==='fail'?'✗ 已投不通過':'△ 已投棄權'}</span>`;}
-  const cardCls=hasVoted?(myVote.result==='pass'?'voted-pass':myVote.result==='fail'?'voted-fail':'voted-abs'):'';
-  const frChecks=S.failSel[id]||{},dis=noLogin?'disabled':'';
-  const frHTML=`<div class="fail-reasons" id="fr-${id}" style="display:${curSel==='fail'?'block':'none'}"><div class="fr-title">不通過原因（可複選）</div><div class="fr-grid">${FAIL_REASONS.map(r=>`<div class="fr-item" onclick="toggleFRClick('${id}','${r.key}')"><input type="checkbox" id="fr-${id}-${r.key}" onchange="toggleFR('${id}','${r.key}',this.checked)" ${frChecks[r.key]?'checked':''} ${dis}><label for="fr-${id}-${r.key}">${r.label}</label></div>`).join('')}</div></div>`;
-  return`<div class="cc ${cardCls}" id="cc-${id}">
-    <div class="cc-head">
-      <div><div class="cc-case">CASE NO.${String(idx).padStart(2,'00')}</div><div class="cc-name">${c.name}</div><div class="cc-dept">${[c.div,c.dept,c.section].filter(Boolean).join(' › ')}</div></div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;"><div class="cc-empid">${c.empId||''}</div>${mvBadge}</div>
+  Object.entries(S.candidates).forEach(([id,c])=>{
+    const my=S.myVotes[id];
+    const has=!!my;
+
+    html+=`
+    <div class="cc ${has?"voted-"+my.result:""}">
+      ${has?'<div class="voted-badge">✓ 已投票</div>':""}
+
+      <b>${c.name}</b><br>
+      通過:${c.passCount||0} 不通過:${c.failCount||0} 棄權:${c.absCount||0}
+
+      <button class="submit-btn ${has?"voted":""}" onclick="vote('${id}','pass')">
+        ${has?"修改投票結果":"投票"}
+      </button>
     </div>
-    <div class="cc-body">
-      <div class="info-pills">
-        <div class="pill"><div class="pill-label">當期績效等第</div><div class="pill-val">${c.performance||'—'}</div></div>
-        <div class="pill"><div class="pill-label">入職日</div><div class="pill-val">${c.joinDate||'—'}</div></div>
-        <div class="pill"><div class="pill-label">年資</div><div class="pill-val">${c.tenure||'—'}</div></div>
-        ${c.reviewType?`<div class="pill"><div class="pill-label">審查</div><div class="pill-val">${c.reviewType}審</div></div>`:''}
-      </div>
-      <div class="promo-row">
-        <span class="ptag ptag-b">${c.beforeGrade||'?'}</span><span class="ptag ptag-b">${c.beforeTitle||'?'}</span>
-        <span class="p-arrow">→</span>
-        <span class="ptag ptag-a">${c.afterGrade||'?'}</span><span class="ptag ptag-a">${c.afterTitle||'?'}</span>
-        ${c.moveType?`<span class="promo-type-tag">${c.moveType}</span>`:''}
-      </div>
-      <div class="vote-section">
-        <div class="vote-row-label">人評會意見${hasVoted?' · 可重新選擇修改':''}</div>
-        <div class="vote-btns">
-          <button class="vbtn pass ${curSel==='pass'?'sel':''}" id="vb-${id}-pass" onclick="selectVote('${id}','pass')" ${dis}>✓ 通過</button>
-          <button class="vbtn fail ${curSel==='fail'?'sel':''}" id="vb-${id}-fail" onclick="selectVote('${id}','fail')" ${dis}>✗ 不通過</button>
-          <button class="vbtn abs ${curSel==='abs'?'sel':''}" id="vb-${id}-abs" onclick="selectVote('${id}','abs')" ${dis}>△ 棄權</button>
-        </div>
-      </div>
-      ${frHTML}
-      <div class="res-wrap">
-        <div class="res-top"><span class="res-lbl">即時統計（匿名）</span><span class="res-nums">通過 ${pC} · 不通過 ${fC} · 棄權 ${aC}</span></div>
-        <div class="res-bar"><div class="rb-p" style="width:${pPct}%"></div><div class="rb-f" style="width:${fPct}%"></div><div class="rb-a" style="width:${aPct}%"></div></div>
-      </div>
-      ${!noLogin?`<button class="submit-btn" onclick="submitVote('${id}')">${hasVoted?'修改投票結果':'提交投票結果'}</button>`:''}
-    </div>
-  </div>`;
+    `;
+  });
+
+  document.getElementById("app").innerHTML=html;
 }
 
-function renderResults(){
-  const wall=document.getElementById('results-auth-wall');
-  const grid=document.getElementById('results-grid');
-  if(!adminOn){wall.style.display='flex';grid.style.display='none';return;}
-  wall.style.display='none';grid.style.display='grid';
-  const entries=Object.entries(S.candidates);
-  if(!entries.length){grid.innerHTML='<div class="no-cases" style="grid-column:1/-1"><div style="font-size:36px;margin-bottom:10px">📊</div><p style="color:var(--txd)">尚無案件</p></div>';return;}
-  grid.innerHTML=entries.map(([id,c])=>{
-    const pC=c.passCount||0,fC=c.failCount||0,aC=c.absCount||0,total=pC+fC+aC;
-    const pPct=total>0?Math.round(pC/total*100):0,fPct=total>0?Math.round(fC/total*100):0,aPct=total>0?Math.round(aC/total*100):0;
-    let verdict='',vCls='';
-    if(total===0){verdict='尚無票數';vCls='vb-tie';}
-    else if(pC>fC){verdict='✓ 通過';vCls='vb-pass';}
-    else if(fC>pC){verdict='✗ 不通過';vCls='vb-fail';}
-    else{verdict='— 同票';vCls='vb-tie';}
-    const cardCls=total===0?'':(pC>fC?'leading-pass':fC>pC?'leading-fail':'');
-    return`<div class="rc ${cardCls}">
-      <div class="rc-accent"></div>
-      <div class="rc-inner">
-        <div class="rc-name">${c.name}</div>
-        <div class="rc-dept">${[c.div,c.dept,c.section].filter(Boolean).join(' › ')}</div>
-        <span class="verdict-badge ${vCls}">${verdict}</span>
-        <div class="rc-counts">
-          <div class="rc-count-item p"><div class="rc-count-num">${pC}</div><div class="rc-count-lbl">通過</div></div>
-          <div class="rc-count-item f"><div class="rc-count-num">${fC}</div><div class="rc-count-lbl">不通過</div></div>
-          <div class="rc-count-item a"><div class="rc-count-num">${aC}</div><div class="rc-count-lbl">棄權</div></div>
-        </div>
-        <div class="rc-bar"><div class="rb-p" style="width:${pPct}%"></div><div class="rb-f" style="width:${fPct}%"></div><div class="rb-a" style="width:${aPct}%"></div></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function updateStats(){
-  document.getElementById('sv-total').textContent=S.records.length;
-  document.getElementById('sv-voters').textContent=new Set(S.records.map(r=>r.empId)).size;
-  document.getElementById('sv-cands').textContent=Object.keys(S.candidates).length;
-}
-
-function adminLogin(){
-  if(document.getElementById('admin-pw').value===ADMIN_PW){
-    adminOn=true;
-    document.getElementById('admin-login-section').style.display='none';
-    document.getElementById('admin-dash').style.display='flex';
-    renderAdminList();renderRecords();renderResults();
-  }else showToast('密碼錯誤',true);
-}
-function adminLogout(){
-  adminOn=false;
-  document.getElementById('admin-login-section').style.display='block';
-  document.getElementById('admin-dash').style.display='none';
-  document.getElementById('admin-pw').value='';
-  renderResults();
-}
-
-async function addCandidate(){
-  const empId=document.getElementById('n-empid').value.trim(),name=document.getElementById('n-name').value.trim();
-  if(!name||!empId){showToast('請填寫工號與姓名',true);return;}
-  try{
-    await db.ref('candidates').push({empId,name,div:document.getElementById('n-div').value.trim(),dept:document.getElementById('n-dept').value.trim(),section:document.getElementById('n-sec').value.trim(),performance:document.getElementById('n-perf').value,joinDate:document.getElementById('n-joindate').value,tenure:document.getElementById('n-tenure').value,moveType:document.getElementById('n-movetype').value,reviewType:document.getElementById('n-reviewtype').value,beforeGrade:document.getElementById('n-bg').value.trim(),beforeTitle:document.getElementById('n-bt').value.trim(),afterGrade:document.getElementById('n-ag').value.trim(),afterTitle:document.getElementById('n-at').value.trim(),passCount:0,failCount:0,absCount:0});
-    ['n-empid','n-name','n-div','n-dept','n-sec','n-joindate','n-tenure','n-bg','n-bt','n-ag','n-at'].forEach(id=>document.getElementById(id).value='');
-    ['n-perf','n-movetype','n-reviewtype'].forEach(id=>document.getElementById(id).value='');
-    showToast('✅ 已新增：'+name);
-  }catch(e){showToast('新增失敗',true);}
-}
-
-async function deleteCandidate(id,name){
-  if(!confirm('確定要刪除「'+name+'」嗎？'))return;
-  try{await db.ref('candidates/'+id).remove();showToast('已刪除：'+name);}catch(e){showToast('刪除失敗',true);}
-}
-
-async function resetAll(){
-  if(!confirm('確定要清除所有票數與投票紀錄嗎？'))return;
-  try{
-    const u={};Object.keys(S.candidates).forEach(id=>{u['candidates/'+id+'/passCount']=0;u['candidates/'+id+'/failCount']=0;u['candidates/'+id+'/absCount']=0;});
-    await db.ref().update(u);await db.ref('vote_records').remove();showToast('✅ 已清除所有票數');
-  }catch(e){showToast('清除失敗',true);}
-}
-
-function renderAdminList(){
-  const el=document.getElementById('admin-clist'),entries=Object.entries(S.candidates);
-  if(!entries.length){el.innerHTML='<div class="empty-s">尚無案件</div>';return;}
-  el.innerHTML=entries.map(([id,c])=>`<div class="acli">
-    <div class="acli-info"><div class="acli-name">${c.name} <span style="font-family:Space Mono;font-size:9px;color:var(--txd);">${c.empId||''}</span></div><div class="acli-sub">${[c.div,c.dept,c.section].filter(Boolean).join(' › ')} ｜ ${c.beforeTitle||'?'}→${c.afterTitle||'?'} ｜ ${c.moveType||''}</div></div>
-    <div class="acli-votes"><div style="color:var(--pass)">✓${c.passCount||0}</div><div style="color:var(--fail)">✗${c.failCount||0}</div><div style="color:var(--abs)">△${c.absCount||0}</div></div>
-    <button class="btn btn-s" onclick="openEditModal('${id}')" style="font-size:11px;">修改</button>
-    <button class="btn btn-d" onclick="deleteCandidate('${id}','${c.name}')">刪除</button>
-  </div>`).join('');
-}
-
-function openEditModal(id){
-  const c=S.candidates[id];if(!c)return;
-  document.getElementById('edit-id').value=id;
-  document.getElementById('e-empid').value=c.empId||'';
-  document.getElementById('e-name').value=c.name||'';
-  document.getElementById('e-div').value=c.div||'';
-  document.getElementById('e-dept').value=c.dept||'';
-  document.getElementById('e-sec').value=c.section||'';
-  document.getElementById('e-perf').value=c.performance||'';
-  document.getElementById('e-joindate').value=c.joinDate||'';
-  document.getElementById('e-tenure').value=c.tenure||'';
-  document.getElementById('e-movetype').value=c.moveType||'';
-  document.getElementById('e-reviewtype').value=c.reviewType||'';
-  document.getElementById('e-bg').value=c.beforeGrade||'';
-  document.getElementById('e-bt').value=c.beforeTitle||'';
-  document.getElementById('e-ag').value=c.afterGrade||'';
-  document.getElementById('e-at').value=c.afterTitle||'';
-  document.getElementById('edit-modal').classList.add('open');
-}
-function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');}
-async function saveEdit(){
-  const id=document.getElementById('edit-id').value;if(!id)return;
-  try{
-    await db.ref('candidates/'+id).update({empId:document.getElementById('e-empid').value.trim(),name:document.getElementById('e-name').value.trim(),div:document.getElementById('e-div').value.trim(),dept:document.getElementById('e-dept').value.trim(),section:document.getElementById('e-sec').value.trim(),performance:document.getElementById('e-perf').value,joinDate:document.getElementById('e-joindate').value,tenure:document.getElementById('e-tenure').value,moveType:document.getElementById('e-movetype').value,reviewType:document.getElementById('e-reviewtype').value,beforeGrade:document.getElementById('e-bg').value.trim(),beforeTitle:document.getElementById('e-bt').value.trim(),afterGrade:document.getElementById('e-ag').value.trim(),afterTitle:document.getElementById('e-at').value.trim()});
-    closeEditModal();showToast('✅ 已儲存修改');
-  }catch(e){showToast('儲存失敗',true);}
-}
-
-function renderRecords(){
-  const tbody=document.getElementById('rtbody'),empty=document.getElementById('empty-r');
-  if(!S.records.length){tbody.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  tbody.innerHTML=S.records.map((r,i)=>{
-    const frText=(r.failReasons||[]).map(k=>FAIL_REASONS.find(f=>f.key===k)?.label||k).join('、')||'—';
-    const rCls=r.result==='pass'?'rtag-p':r.result==='fail'?'rtag-f':'rtag-a';
-    const rLbl=r.result==='pass'?'✓ 通過':r.result==='fail'?'✗ 不通過':'△ 棄權';
-    return`<tr><td style="color:var(--txd);font-size:9px;">${S.records.length-i}</td><td><strong>${r.name}</strong></td><td style="font-size:9px;color:var(--txd);">${r.empId}</td><td>${r.candidateName}</td><td><span class="rtag ${rCls}">${rLbl}</span></td><td style="font-size:9px;color:var(--txd);">${r.result==='fail'?frText:'—'}</td><td style="font-size:9px;color:var(--txd);">${r.time}</td></tr>`;
-  }).join('');
-}
-
-function switchPage(name,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  btn.classList.add('active');window.scrollTo(0,0);
-}
-
-function showToast(msg,isError=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast'+(isError?' error':'');
-  setTimeout(()=>t.classList.add('show'),10);
-  setTimeout(()=>t.classList.remove('show'),3200);
-}
 </script>
+
 </body>
 </html>

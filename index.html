@@ -538,12 +538,27 @@ function saveReviewerCount(){
 
 function updateReviewerDisplay(){}
 
+// ── 正確計算年資（考慮日期，不會提前進位）
+function calcTenureFromDate(joinDateStr){
+  if(!joinDateStr)return'—';
+  const join=new Date(joinDateStr);
+  if(isNaN(join))return'—';
+  const today=new Date();
+  // 今天還沒到入職日，年資為 0
+  if(today<join)return'未到職';
+  let y=today.getFullYear()-join.getFullYear();
+  let m=today.getMonth()-join.getMonth();
+  // 還沒到當月入職日，月份往回一個月
+  if(today.getDate()<join.getDate())m--;
+  if(m<0){y--;m+=12;}
+  if(y===0&&m===0)return'未滿1個月';
+  if(y===0)return m+'個月';
+  return y+'年'+m+'個月';
+}
+
 function calcTenure(dateInputId,tenureInputId){
   const v=document.getElementById(dateInputId).value;if(!v)return;
-  const join=new Date(v),today=new Date();
-  let y=today.getFullYear()-join.getFullYear(),m=today.getMonth()-join.getMonth();
-  if(m<0){y--;m+=12;}
-  document.getElementById(tenureInputId).value=y+'年'+m+'月';
+  document.getElementById(tenureInputId).value=calcTenureFromDate(v);
 }
 
 function onEmpIdInput(){
@@ -937,7 +952,7 @@ function buildCard(id,idx){
         <div class="info-pills">
           <div class="pill"><div class="pill-label">當期績效等第</div><div class="pill-val">${c.performance||'—'}</div></div>
           <div class="pill"><div class="pill-label">入職日</div><div class="pill-val">${c.joinDate||'—'}</div></div>
-          <div class="pill"><div class="pill-label">年資</div><div class="pill-val">${c.tenure||'—'}</div></div>
+          <div class="pill"><div class="pill-label">年資</div><div class="pill-val">${c.joinDate?calcTenureFromDate(c.joinDate):'—'}</div></div>
           ${c.reviewType?`<div class="pill"><div class="pill-label">審查</div><div class="pill-val">${c.reviewType}審</div></div>`:''}
         </div>
         <div class="promo-row">

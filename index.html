@@ -915,9 +915,18 @@ async function submitVote(cid){
 
 function renderCandidates(){
   const list=document.getElementById('cards-list');
-  const entries=Object.entries(S.candidates);
-  if(!entries.length){list.innerHTML='<div class="no-cases"><div style="font-size:40px;margin-bottom:10px">📋</div><p>尚無審核案件<br><span style="font-size:11px">請至設定頁新增</span></p></div>';return;}
-  list.innerHTML=entries.map(([id],i)=>buildCard(id,i+1)).join('');
+  const allEntries=Object.entries(S.candidates);
+  if(!allEntries.length){
+    list.innerHTML='<div class="no-cases"><div style="font-size:40px;margin-bottom:10px">📋</div><p>尚無審核案件<br><span style="font-size:11px">請至設定頁新增</span></p></div>';
+    return;
+  }
+  // 只顯示尚未結束投票（未鎖定）的案件
+  const openEntries=allEntries.filter(([id])=>!S.voteLocked[id]);
+  if(!openEntries.length){
+    list.innerHTML='<div class="no-cases"><div style="font-size:36px;margin-bottom:10px">🔒</div><p style="color:var(--txd)">目前無開放中的投票案件<br><span style="font-size:11px">請等候主辦方開放投票</span></p></div>';
+    return;
+  }
+  list.innerHTML=openEntries.map(([id],i)=>buildCard(id,i+1)).join('');
 }
 
 function buildCard(id,idx){

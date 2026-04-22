@@ -1,0 +1,22 @@
+{
+  "name": "JENTECH 人評會投票",
+  "short_name": "人評會投票",
+  "description": "JENTECH 人員晉升人評會線上投票系統",
+  "start_url": "/votingsystem/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#e11d48",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=JT&background=e11d48&color=fff&size=192&bold=true&font-size=0.45",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://ui-avatars.com/api/?name=JT&background=e11d48&color=fff&size=512&bold=true&font-size=0.45",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

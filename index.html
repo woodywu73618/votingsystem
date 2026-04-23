@@ -9,11 +9,12 @@
 :root{--bg:#f4f4f6;--sf:#fff;--sf2:#f0f0f4;--sf3:#e8e8ee;--bd:#dddde8;--bd2:#c8c8d8;--tx:#111118;--txd:#888899;--txl:#555566;--ac:#6c63ff;--ac2:#ff6584;--ac3:#22c55e;--gold:#f59e0b;--pass:#22c55e;--fail:#ef4444;--abs:#f59e0b;--nav-h:64px;--safe-bottom:env(safe-area-inset-bottom,0px);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;padding-bottom:calc(var(--nav-h) + var(--safe-bottom));}
-#login-screen{position:fixed;inset:0;background:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+#login-screen{position:fixed;inset:0;background:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 32px;}
 .login-box{width:100%;max-width:380px;text-align:center;}
 .login-logo-area{margin-bottom:28px;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .jentech-logo{display:none;}
-.jentech-logo-img{height:52px;width:auto;display:block;}
+.jentech-logo-img{display:none;}
+.jentech-logo-text{font-family:'Space Mono','Courier New',monospace;font-size:38px;font-weight:700;color:#e11d48;letter-spacing:0.04em;line-height:1;}
 .login-title{font-size:18px;font-weight:700;color:var(--tx);margin-bottom:2px;}
 .login-title span{color:#e11d48;}
 .login-sub-text{font-size:12px;color:var(--txd);}
@@ -210,7 +211,7 @@ tr:last-child td{border-bottom:none;}
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo-area">
-      <img src="LOGO_PLACEHOLDER" alt="JENTECH" class="jentech-logo-img">
+      <div class="jentech-logo-text">JENTECH</div>
       <div>
         <div class="login-title">人評會<span>投票系統</span></div>
         <div class="login-sub-text">Promotion Review Committee</div>
